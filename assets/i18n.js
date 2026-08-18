@@ -101,7 +101,11 @@ const I18N = {
       errorInvalidEmail: "Bitte gib eine gültige E-Mail-Adresse ein.",
       errorPasswordShort: "Das Passwort muss mindestens 8 Zeichen lang sein.",
       errorGeneric: "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
-      backendHint: "Diese Seite braucht PHP + MySQL (z. B. Namecheap-Hosting mit phpMyAdmin). Auf GitHub Pages funktioniert das Depot nicht, da dort kein PHP läuft."
+      backendHint: "Diese Seite braucht PHP + MySQL (z. B. Namecheap-Hosting mit phpMyAdmin). Auf GitHub Pages funktioniert das Depot nicht, da dort kein PHP läuft.",
+      priceLine: (amount) => `Spielpreis: ${amount}`,
+      statusWinLabel: "Gewonnen 🎉",
+      statusLossLabel: "Kein Gewinn",
+      wonAmountLine: (amount) => `Gewinnbetrag: ${amount}`
     },
     admin: {
       title: "Admin-Bereich",
@@ -269,7 +273,11 @@ const I18N = {
       errorInvalidEmail: "Veuillez saisir une adresse e-mail valide.",
       errorPasswordShort: "Le mot de passe doit contenir au moins 8 caractères.",
       errorGeneric: "Une erreur est survenue. Veuillez réessayer.",
-      backendHint: "Cette page nécessite PHP + MySQL (par ex. un hébergement Namecheap avec phpMyAdmin). Sur GitHub Pages, le compte ne fonctionnera pas car PHP n'y est pas disponible."
+      backendHint: "Cette page nécessite PHP + MySQL (par ex. un hébergement Namecheap avec phpMyAdmin). Sur GitHub Pages, le compte ne fonctionnera pas car PHP n'y est pas disponible.",
+      priceLine: (amount) => `Prix du ticket : ${amount}`,
+      statusWinLabel: "Gagné 🎉",
+      statusLossLabel: "Aucun gain",
+      wonAmountLine: (amount) => `Montant gagné : ${amount}`
     },
     admin: {
       title: "Espace admin",
@@ -437,7 +445,11 @@ const I18N = {
       errorInvalidEmail: "Voer een geldig e-mailadres in.",
       errorPasswordShort: "Het wachtwoord moet minstens 8 tekens bevatten.",
       errorGeneric: "Er is iets misgegaan. Probeer het opnieuw.",
-      backendHint: "Deze pagina heeft PHP + MySQL nodig (bijv. Namecheap-hosting met phpMyAdmin). Op GitHub Pages werkt het depot niet, omdat daar geen PHP draait."
+      backendHint: "Deze pagina heeft PHP + MySQL nodig (bijv. Namecheap-hosting met phpMyAdmin). Op GitHub Pages werkt het depot niet, omdat daar geen PHP draait.",
+      priceLine: (amount) => `Speelprijs: ${amount}`,
+      statusWinLabel: "Gewonnen 🎉",
+      statusLossLabel: "Geen winst",
+      wonAmountLine: (amount) => `Gewonnen bedrag: ${amount}`
     },
     admin: {
       title: "Adminomgeving",
@@ -605,7 +617,11 @@ const I18N = {
       errorInvalidEmail: "Ongeldig e-mailadres. / E-mail invalide.",
       errorPasswordShort: "Wachtwoord te kort (min. 8). / Mot de passe trop court (8 min.).",
       errorGeneric: "Er ging iets mis. / Une erreur est survenue.",
-      backendHint: "Vereist PHP + MySQL hosting (bv. Namecheap + phpMyAdmin). / Nécessite un hébergement PHP + MySQL (ex. Namecheap + phpMyAdmin)."
+      backendHint: "Vereist PHP + MySQL hosting (bv. Namecheap + phpMyAdmin). / Nécessite un hébergement PHP + MySQL (ex. Namecheap + phpMyAdmin).",
+      priceLine: (amount) => `Speelprijs / Prix : ${amount}`,
+      statusWinLabel: "Gewonnen / Gagné 🎉",
+      statusLossLabel: "Geen winst / Aucun gain",
+      wonAmountLine: (amount) => `Gewonnen bedrag / Montant gagné : ${amount}`
     },
     admin: {
       title: "Admin / Espace admin",

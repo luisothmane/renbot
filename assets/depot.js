@@ -206,6 +206,11 @@ async function loadDepotTickets() {
   renderDepotTicketList();
 }
 
+function formatMoney(amount) {
+  const locales = { de: "de-DE", fr: "fr-FR", nl: "nl-NL", be: "nl-BE" };
+  return new Intl.NumberFormat(locales[lang] || "de-DE", { style: "currency", currency: "EUR" }).format(Number(amount) || 0);
+}
+
 function formatDate(iso) {
   const locales = { de: "de-DE", fr: "fr-FR", nl: "nl-NL", be: "nl-BE" };
   return new Date(iso.replace(" ", "T")).toLocaleDateString(locales[lang] || "de-DE", { year: "numeric", month: "short", day: "numeric" });
@@ -262,6 +267,21 @@ function buildDepotTicketCard(ticket, T) {
     });
   }
   card.appendChild(numbersRow);
+
+  const statusRow = document.createElement("div");
+  statusRow.className = "ticket-meta";
+  statusRow.style.margin = "0.6rem 0";
+  let statusHtml = T.depot.priceLine(formatMoney(ticket.price));
+  if (ticket.statusOverride === "win") {
+    statusHtml += `<br><span style="color:var(--win); font-weight:700;">${T.depot.statusWinLabel}</span>`;
+    if (ticket.wonAmount !== null) {
+      statusHtml += `<br><span style="color:var(--win); font-weight:700;">${T.depot.wonAmountLine(formatMoney(ticket.wonAmount))}</span>`;
+    }
+  } else if (ticket.statusOverride === "loss") {
+    statusHtml += `<br><span style="color:var(--no-win);">${T.depot.statusLossLabel}</span>`;
+  }
+  statusRow.innerHTML = statusHtml;
+  card.appendChild(statusRow);
 
   const actions = document.createElement("div");
   actions.className = "ticket-card-actions";

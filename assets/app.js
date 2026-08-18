@@ -1,6 +1,12 @@
+function initialGameId() {
+  const param = new URLSearchParams(location.search).get("game");
+  if (param && GAME_SPECS[param]) return param;
+  return localStorage.getItem("game") || "euromillions";
+}
+
 const STATE = {
-  lang: localStorage.getItem("lang") || "de",
-  gameId: localStorage.getItem("game") || "euromillions",
+  lang: getStoredLang(),
+  gameId: initialGameId(),
   yourMain: new Set(),
   yourBonus: new Set(),
   winMain: new Set(),
@@ -15,36 +21,6 @@ function game() {
   return GAME_SPECS[STATE.gameId];
 }
 
-function buildGrid(container, min, max, maxCount, setRef, onChange) {
-  container.innerHTML = "";
-  for (let i = min; i <= max; i++) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "num-btn";
-    btn.textContent = i;
-    btn.dataset.value = i;
-    btn.addEventListener("click", () => {
-      if (setRef.has(i)) {
-        setRef.delete(i);
-        btn.classList.remove("selected");
-      } else {
-        if (setRef.size >= maxCount) return;
-        setRef.add(i);
-        btn.classList.add("selected");
-      }
-      onChange();
-    });
-    container.appendChild(btn);
-  }
-}
-
-function syncGridVisual(container, setRef) {
-  container.querySelectorAll(".num-btn").forEach((btn) => {
-    const v = Number(btn.dataset.value);
-    btn.classList.toggle("selected", setRef.has(v));
-  });
-}
-
 function updateCounts() {
   const T = t();
   const g = game();
@@ -54,27 +30,6 @@ function updateCounts() {
     document.getElementById("yourBonusCount").textContent = T.countLabel(STATE.yourBonus.size, g.bonusCount);
     document.getElementById("winBonusCount").textContent = T.countLabel(STATE.winBonus.size, g.bonusCount);
   }
-}
-
-function findTier(g, mainMatches, bonusMatches) {
-  for (let i = 0; i < g.tiers.length; i++) {
-    const [m, b] = g.tiers[i];
-    if (m === mainMatches && (g.bonusCount === 0 || b === bonusMatches)) {
-      return { rank: i + 1, main: m, bonus: b, isJackpot: i === 0 };
-    }
-  }
-  return null;
-}
-
-function tierLabel(T, g, gameId, tier) {
-  const gameT = T.games[gameId];
-  let desc = `${tier.main} ${T.mainNumbersLabel}`;
-  if (g.bonusCount > 0) {
-    desc += ` + ${tier.bonus} ${gameT.bonusLabel}`;
-  }
-  let label = `${T.rankWord} ${tier.rank}`;
-  if (tier.isJackpot) label += T.jackpotSuffix;
-  return `${label} (${desc})`;
 }
 
 function isComplete() {
@@ -154,10 +109,10 @@ function resetAll() {
   STATE.yourBonus.clear();
   STATE.winMain.clear();
   STATE.winBonus.clear();
-  syncGridVisual(document.getElementById("yourMainGrid"), STATE.yourMain);
-  syncGridVisual(document.getElementById("yourBonusGrid"), STATE.yourBonus);
-  syncGridVisual(document.getElementById("winMainGrid"), STATE.winMain);
-  syncGridVisual(document.getElementById("winBonusGrid"), STATE.winBonus);
+  syncBallGrid(document.getElementById("yourMainGrid"), STATE.yourMain);
+  syncBallGrid(document.getElementById("yourBonusGrid"), STATE.yourBonus);
+  syncBallGrid(document.getElementById("winMainGrid"), STATE.winMain);
+  syncBallGrid(document.getElementById("winBonusGrid"), STATE.winBonus);
   clearHighlights();
   updateCounts();
   clearResultUI();
@@ -170,8 +125,8 @@ function loadExampleDraw(index) {
   if (!draw) return;
   STATE.winMain = new Set(draw.main);
   STATE.winBonus = new Set(draw.bonus);
-  syncGridVisual(document.getElementById("winMainGrid"), STATE.winMain);
-  syncGridVisual(document.getElementById("winBonusGrid"), STATE.winBonus);
+  syncBallGrid(document.getElementById("winMainGrid"), STATE.winMain);
+  syncBallGrid(document.getElementById("winBonusGrid"), STATE.winBonus);
   clearHighlights();
   updateCounts();
   clearResultUI();
@@ -213,14 +168,14 @@ function applyGameLayout() {
   const T = t();
   const gameT = T.games[STATE.gameId];
 
-  buildGrid(document.getElementById("yourMainGrid"), g.mainMin, g.mainMax, g.mainCount, STATE.yourMain, updateCounts);
-  buildGrid(document.getElementById("winMainGrid"), g.mainMin, g.mainMax, g.mainCount, STATE.winMain, updateCounts);
+  buildBallGrid(document.getElementById("yourMainGrid"), g.mainMin, g.mainMax, g.mainCount, STATE.yourMain, updateCounts);
+  buildBallGrid(document.getElementById("winMainGrid"), g.mainMin, g.mainMax, g.mainCount, STATE.winMain, updateCounts);
 
   const bonusSections = document.querySelectorAll(".bonus-section");
   if (g.bonusCount > 0) {
     bonusSections.forEach((el) => (el.hidden = false));
-    buildGrid(document.getElementById("yourBonusGrid"), g.bonusMin, g.bonusMax, g.bonusCount, STATE.yourBonus, updateCounts);
-    buildGrid(document.getElementById("winBonusGrid"), g.bonusMin, g.bonusMax, g.bonusCount, STATE.winBonus, updateCounts);
+    buildBallGrid(document.getElementById("yourBonusGrid"), g.bonusMin, g.bonusMax, g.bonusCount, STATE.yourBonus, updateCounts);
+    buildBallGrid(document.getElementById("winBonusGrid"), g.bonusMin, g.bonusMax, g.bonusCount, STATE.winBonus, updateCounts);
     document.getElementById("yourBonusLabel").textContent = gameT.bonusLabel;
     document.getElementById("winBonusLabel").textContent = gameT.bonusLabel;
   } else {
@@ -251,22 +206,19 @@ function applyTranslations() {
   const T = t();
   document.title = T.pageTitle;
   document.documentElement.lang = STATE.lang === "be" ? "nl" : STATE.lang;
-  document.querySelectorAll("[data-i18n]").forEach((el) => {
-    const key = el.dataset.i18n;
-    if (typeof T[key] === "string") el.textContent = T[key];
-  });
+  applyDataI18n(T);
+  setFooterYear(T);
+  setActiveNav();
+  renderFooterGamesList(T);
 
   renderGameTabs();
   applyGameLayout();
 
-  document.querySelectorAll(".lang-btn").forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.lang === STATE.lang);
-  });
+  setActiveLangButtons(STATE.lang);
 }
 
 function setLang(lang) {
   STATE.lang = lang;
-  localStorage.setItem("lang", lang);
   applyTranslations();
 }
 
@@ -275,9 +227,8 @@ function init() {
   document.getElementById("resetBtn").addEventListener("click", resetAll);
   document.getElementById("exampleSelect").addEventListener("change", (e) => loadExampleDraw(e.target.value));
 
-  document.querySelectorAll(".lang-btn").forEach((btn) => {
-    btn.addEventListener("click", () => setLang(btn.dataset.lang));
-  });
+  bindLangButtons(setLang);
+  bindMobileNav();
 
   applyTranslations();
 }

@@ -10,101 +10,122 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
-<body>
-  <div class="topbar">
-    <div class="topbar-inner">
-      <div class="brand" data-i18n="brand">Lotto Checker</div>
-      <div class="lang-switch">
-        <button class="lang-btn" data-lang="de" type="button" title="Deutsch"><span class="flag">🇩🇪</span>DE</button>
-        <button class="lang-btn" data-lang="fr" type="button" title="Français"><span class="flag">🇫🇷</span>FR</button>
-        <button class="lang-btn" data-lang="nl" type="button" title="Nederlands"><span class="flag">🇳🇱</span>NL</button>
-        <button class="lang-btn" data-lang="be" type="button" title="Belgique/België"><span class="flag">🇧🇪</span>BE</button>
+<body data-page="home">
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark"></span><span data-i18n="brand">Lotto Checker</span></a>
+      <nav class="site-nav" id="siteNav">
+        <a class="nav-link" data-nav="home" href="index.html" data-i18n="nav.home">Startseite</a>
+        <a class="nav-link" data-nav="checker" href="checker.html" data-i18n="nav.checker">Zahlen-Checker</a>
+        <a class="nav-link" data-nav="tickets" href="tickets.html" data-i18n="nav.tickets">Meine Tickets</a>
+      </nav>
+      <div class="header-actions">
+        <div class="lang-switch">
+          <button class="lang-btn" data-lang="de" type="button" title="Deutsch"><span class="flag">🇩🇪</span>DE</button>
+          <button class="lang-btn" data-lang="fr" type="button" title="Français"><span class="flag">🇫🇷</span>FR</button>
+          <button class="lang-btn" data-lang="nl" type="button" title="Nederlands"><span class="flag">🇳🇱</span>NL</button>
+          <button class="lang-btn" data-lang="be" type="button" title="Belgique/België"><span class="flag">🇧🇪</span>BE</button>
+        </div>
+        <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-label="Menu">☰</button>
       </div>
     </div>
-  </div>
-
-  <header>
-    <div class="header-orbs" aria-hidden="true">
-      <span class="orb orb-1"></span>
-      <span class="orb orb-2"></span>
-      <span class="orb orb-3"></span>
-      <span class="orb orb-4"></span>
-    </div>
-    <h1 data-i18n="headerTitle">Europa Lotto Zahlen-Checker</h1>
-    <p data-i18n="headerSubtitle">Wähle eine Lotterie und prüfe deine Zahlen.</p>
   </header>
 
-  <main>
-    <section class="game-select-panel">
-      <p class="section-kicker" data-i18n="gameSelectorLabel">Lotterie wählen</p>
-      <div class="game-switch" id="gameSwitch"></div>
-    </section>
-
-    <section class="panel">
-      <h2 data-i18n="yourNumbersTitle">1. Deine getippten Zahlen</h2>
-      <p class="hint" id="yourNumbersHint">Wähle deine Zahlen.</p>
-
-      <div class="group-label">
-        <span data-i18n="mainNumbersLabel">Zahlen</span>
-        <span class="count" id="yourMainCount">0 / 5</span>
-      </div>
-      <div class="grid" id="yourMainGrid"></div>
-
-      <div class="bonus-section">
-        <div class="group-label">
-          <span id="yourBonusLabel">Sterne</span>
-          <span class="count" id="yourBonusCount">0 / 2</span>
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <span class="hero-kicker" data-i18n="home.heroKicker">Für Deutschland, Frankreich, die Niederlande &amp; Belgien</span>
+        <h1 data-i18n="home.heroTitle">Deine Lottozahlen im Blick — für ganz Europa</h1>
+        <p data-i18n="home.heroSubtitle">EuroMillions, Eurojackpot, Lotto 6aus49, Loto und Lotto 6/45 an einem Ort.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="checker.html" data-i18n="home.ctaPrimary">Zahlen jetzt prüfen</a>
+          <a class="btn btn-secondary" href="tickets.html" data-i18n="home.ctaSecondary">Meine Tickets ansehen</a>
         </div>
-        <div class="grid grid-bonus" id="yourBonusGrid"></div>
       </div>
-    </section>
-
-    <section class="panel">
-      <h2 data-i18n="winningNumbersTitle">2. Ziehungszahlen</h2>
-      <p class="hint" data-i18n="winningNumbersHint">Trage die offiziellen Gewinnzahlen ein.</p>
-
-      <div class="group-label">
-        <span data-i18n="mainNumbersLabel">Zahlen</span>
-        <span class="count" id="winMainCount">0 / 5</span>
-      </div>
-      <div class="grid" id="winMainGrid"></div>
-
-      <div class="bonus-section">
-        <div class="group-label">
-          <span id="winBonusLabel">Sterne</span>
-          <span class="count" id="winBonusCount">0 / 2</span>
+      <div class="hero-visual">
+        <img class="hero-image" id="heroImage" src="assets/hero.jpg" alt=""
+             onload="document.getElementById('heroPlaceholder').style.display='none'"
+             onerror="this.style.display='none'" />
+        <div class="hero-placeholder" id="heroPlaceholder">
+          <span class="hero-ball hb-1">7</span>
+          <span class="hero-ball hb-2">14</span>
+          <span class="hero-ball hb-3">23</span>
+          <span class="hero-ball hb-4">9</span>
+          <span class="hero-ball hb-5">3</span>
         </div>
-        <div class="grid grid-bonus" id="winBonusGrid"></div>
       </div>
-
-      <div class="example-row">
-        <label for="exampleSelect" data-i18n="exampleDrawsLabel">Beispiel-Ziehung laden:</label>
-        <select id="exampleSelect"></select>
-      </div>
-    </section>
-
-    <div class="actions">
-      <button class="btn btn-primary" id="checkBtn" data-i18n="checkButton" type="button">Zahlen prüfen</button>
-      <button class="btn btn-secondary" id="resetBtn" data-i18n="resetButton" type="button">Zurücksetzen</button>
     </div>
+  </section>
 
-    <p class="warning" id="incompleteWarning" hidden></p>
+  <section class="section" id="games">
+    <div class="section-head">
+      <p class="section-kicker" data-i18n="home.gamesKicker">Unsere Lotterien</p>
+      <h2 data-i18n="home.gamesTitle">Fünf Lotterien, ein Checker</h2>
+      <p data-i18n="home.gamesSubtitle">Jede Lotterie hat ihr eigenes Zahlenformat — wir kennen sie alle.</p>
+    </div>
+    <div class="game-grid" id="jackpotGrid"></div>
+    <p class="jackpot-note" data-i18n="home.jackpotNote">* Beispielwert, keine Live-Daten.</p>
+  </section>
 
-    <section class="panel result-panel" id="resultPanel" hidden>
-      <h2 data-i18n="resultTitle">Ergebnis</h2>
-      <p id="resultSummary"></p>
-      <p id="resultTier" hidden></p>
-      <p id="resultMessage"></p>
-    </section>
-  </main>
+  <section class="section">
+    <div class="section-head">
+      <p class="section-kicker" data-i18n="home.stepsKicker">So funktioniert's</p>
+      <h2 data-i18n="home.stepsTitle">In drei Schritten zum Ergebnis</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3 data-i18n="home.step1Title">Lotterie wählen</h3>
+        <p data-i18n="home.step1Desc">Entscheide dich für eine Lotterie.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3 data-i18n="home.step2Title">Zahlen eingeben</h3>
+        <p data-i18n="home.step2Desc">Trage deinen Tipp und die Ziehung ein.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3 data-i18n="home.step3Title">Ergebnis sehen</h3>
+        <p data-i18n="home.step3Desc">Trefferzahl und Gewinnklasse sofort sichtbar.</p>
+      </div>
+    </div>
+  </section>
 
-  <footer>
-    <p data-i18n="footerDisclaimer"></p>
-    <p data-i18n="footerNote"></p>
+  <section class="section">
+    <div class="tickets-teaser">
+      <div class="tickets-teaser-text">
+        <p class="section-kicker" data-i18n="home.ticketsKicker">Ohne Anmeldung</p>
+        <h2 data-i18n="home.ticketsTitle">Speichere deine Scheine als Ticket</h2>
+        <p data-i18n="home.ticketsDesc">Lege deine gespielten Zahlen lokal in deinem Browser ab und prüfe sie später — ganz ohne Konto oder Passwort.</p>
+      </div>
+      <a class="btn btn-light" href="tickets.html" data-i18n="home.ticketsCta">Zu meinen Tickets</a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4 data-i18n="brand">Lotto Checker</h4>
+        <p data-i18n="footerDisclaimer"></p>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footerNavTitle">Navigation</h4>
+        <ul class="footer-links">
+          <li><a href="index.html" data-i18n="nav.home">Startseite</a></li>
+          <li><a href="checker.html" data-i18n="nav.checker">Zahlen-Checker</a></li>
+          <li><a href="tickets.html" data-i18n="nav.tickets">Meine Tickets</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footerGamesTitle">Lotterien</h4>
+        <ul class="footer-links" id="footerGamesList"></ul>
+      </div>
+    </div>
+    <div class="footer-bottom" id="footerYear"></div>
   </footer>
 
   <script src="assets/games.js"></script>
   <script src="assets/i18n.js"></script>
-  <script src="assets/app.js"></script>
+  <script src="assets/site.js"></script>
 </body>
 </html>

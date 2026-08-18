@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zahlen-Checker</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25' r='75%25'%3E%3Cstop offset='0%25' stop-color='%23ffe08a'/%3E%3Cstop offset='100%25' stop-color='%23c9781a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='url(%23g)'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body data-page="checker">
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark"></span><span data-i18n="brand">Lotto Checker</span></a>
+      <nav class="site-nav" id="siteNav">
+        <a class="nav-link" data-nav="home" href="index.html" data-i18n="nav.home">Startseite</a>
+        <a class="nav-link" data-nav="checker" href="checker.html" data-i18n="nav.checker">Zahlen-Checker</a>
+        <a class="nav-link" data-nav="tickets" href="tickets.html" data-i18n="nav.tickets">Meine Tickets</a>
+      </nav>
+      <div class="header-actions">
+        <div class="lang-switch">
+          <button class="lang-btn" data-lang="de" type="button" title="Deutsch"><span class="flag">🇩🇪</span>DE</button>
+          <button class="lang-btn" data-lang="fr" type="button" title="Français"><span class="flag">🇫🇷</span>FR</button>
+          <button class="lang-btn" data-lang="nl" type="button" title="Nederlands"><span class="flag">🇳🇱</span>NL</button>
+          <button class="lang-btn" data-lang="be" type="button" title="Belgique/België"><span class="flag">🇧🇪</span>BE</button>
+        </div>
+        <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-head">
+      <h1 data-i18n="headerTitle">Europa Lotto Zahlen-Checker</h1>
+      <p data-i18n="headerSubtitle">Wähle eine Lotterie und prüfe deine Zahlen.</p>
+    </div>
+
+    <section class="game-select-panel">
+      <p class="section-kicker" data-i18n="gameSelectorLabel">Lotterie wählen</p>
+      <div class="game-switch" id="gameSwitch"></div>
+    </section>
+
+    <section class="panel">
+      <h2 data-i18n="yourNumbersTitle">1. Deine getippten Zahlen</h2>
+      <p class="hint" id="yourNumbersHint">Wähle deine Zahlen.</p>
+
+      <div class="group-label">
+        <span data-i18n="mainNumbersLabel">Zahlen</span>
+        <span class="count" id="yourMainCount">0 / 5</span>
+      </div>
+      <div class="grid" id="yourMainGrid"></div>
+
+      <div class="bonus-section">
+        <div class="group-label">
+          <span id="yourBonusLabel">Sterne</span>
+          <span class="count" id="yourBonusCount">0 / 2</span>
+        </div>
+        <div class="grid grid-bonus" id="yourBonusGrid"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 data-i18n="winningNumbersTitle">2. Ziehungszahlen</h2>
+      <p class="hint" data-i18n="winningNumbersHint">Trage die offiziellen Gewinnzahlen ein.</p>
+
+      <div class="group-label">
+        <span data-i18n="mainNumbersLabel">Zahlen</span>
+        <span class="count" id="winMainCount">0 / 5</span>
+      </div>
+      <div class="grid" id="winMainGrid"></div>
+
+      <div class="bonus-section">
+        <div class="group-label">
+          <span id="winBonusLabel">Sterne</span>
+          <span class="count" id="winBonusCount">0 / 2</span>
+        </div>
+        <div class="grid grid-bonus" id="winBonusGrid"></div>
+      </div>
+
+      <div class="example-row">
+        <label for="exampleSelect" data-i18n="exampleDrawsLabel">Beispiel-Ziehung laden:</label>
+        <select id="exampleSelect"></select>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn" data-i18n="checkButton" type="button">Zahlen prüfen</button>
+      <button class="btn btn-secondary" id="resetBtn" data-i18n="resetButton" type="button">Zurücksetzen</button>
+    </div>
+
+    <p class="warning" id="incompleteWarning" hidden></p>
+
+    <section class="panel result-panel" id="resultPanel" hidden>
+      <h2 data-i18n="resultTitle">Ergebnis</h2>
+      <p id="resultSummary"></p>
+      <p id="resultTier" hidden></p>
+      <p id="resultMessage"></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4 data-i18n="brand">Lotto Checker</h4>
+        <p data-i18n="footerDisclaimer"></p>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footerNavTitle">Navigation</h4>
+        <ul class="footer-links">
+          <li><a href="index.html" data-i18n="nav.home">Startseite</a></li>
+          <li><a href="checker.html" data-i18n="nav.checker">Zahlen-Checker</a></li>
+          <li><a href="tickets.html" data-i18n="nav.tickets">Meine Tickets</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footerGamesTitle">Lotterien</h4>
+        <ul class="footer-links" id="footerGamesList"></ul>
+      </div>
+    </div>
+    <div class="footer-bottom" id="footerYear"></div>
+  </footer>
+
+  <script src="assets/games.js"></script>
+  <script src="assets/i18n.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

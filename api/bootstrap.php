@@ -24,3 +24,16 @@ function require_login(): int {
     }
     return (int) $_SESSION['user_id'];
 }
+
+function require_admin(PDO $pdo): int {
+    $userId = require_login();
+    $stmt = $pdo->prepare('SELECT is_admin FROM users WHERE id = ?');
+    $stmt->execute([$userId]);
+    $row = $stmt->fetch();
+    if (!$row || (int) $row['is_admin'] !== 1) {
+        http_response_code(403);
+        echo json_encode(['error' => 'not_admin']);
+        exit;
+    }
+    return $userId;
+}

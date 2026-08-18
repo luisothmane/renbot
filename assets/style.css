@@ -947,6 +947,12 @@ select {
   border-color: var(--no-win);
 }
 
+.btn-sm.active {
+  background: linear-gradient(100deg, var(--violet-1), var(--violet-3));
+  color: #fff;
+  border-color: var(--violet-2);
+}
+
 .check-panel {
   margin-top: 1rem;
   padding-top: 1rem;

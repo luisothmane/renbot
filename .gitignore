@@ -1,0 +1,2 @@
+# Local database credentials override (see api/db.php) — never commit real DB passwords.
+api/db.local.php

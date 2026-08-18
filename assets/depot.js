@@ -392,7 +392,7 @@ function buildDepotCheckPanel(ticket, T, spec) {
 
 function applyDepotTranslations() {
   const T = t();
-  document.title = T.depot.title;
+  document.title = `${T.brand} – ${T.depot.title}`;
   document.documentElement.lang = lang === "be" ? "nl" : lang;
   applyDataI18n(T);
   setFooterYear(T);

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meine Tickets</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25' r='75%25'%3E%3Cstop offset='0%25' stop-color='%23ffe08a'/%3E%3Cstop offset='100%25' stop-color='%23c9781a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='url(%23g)'/%3E%3C/svg%3E" />
+  <title>Euro Tipp – Meine Tickets</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25' r='75%25'%3E%3Cstop offset='0%25' stop-color='%23ffe08a'/%3E%3Cstop offset='100%25' stop-color='%23c9781a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='url(%23g)'/%3E%3Ctext x='50' y='68' font-family='Arial, sans-serif' font-weight='800' font-size='54' text-anchor='middle' fill='%23241a00'%3E%E2%82%AC%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -13,20 +13,20 @@
 <body data-page="tickets">
   <header class="site-header">
     <div class="header-inner">
-      <a class="brand" href="index.html"><span class="brand-mark"></span><span data-i18n="brand">Lotto Checker</span></a>
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">€</span><span data-i18n="brand">Lotto Checker</span></a>
       <nav class="site-nav" id="siteNav">
         <a class="nav-link" data-nav="home" href="index.html" data-i18n="nav.home">Startseite</a>
         <a class="nav-link" data-nav="checker" href="checker.html" data-i18n="nav.checker">Zahlen-Checker</a>
         <a class="nav-link" data-nav="tickets" href="tickets.html" data-i18n="nav.tickets">Meine Tickets</a>
         <a class="nav-link" data-nav="depot" href="depot.html" data-i18n="nav.depot">Mein Depot</a>
-      </nav>
-      <div class="header-actions">
         <div class="lang-switch">
           <button class="lang-btn" data-lang="de" type="button" title="Deutsch"><span class="flag">🇩🇪</span>DE</button>
           <button class="lang-btn" data-lang="fr" type="button" title="Français"><span class="flag">🇫🇷</span>FR</button>
           <button class="lang-btn" data-lang="nl" type="button" title="Nederlands"><span class="flag">🇳🇱</span>NL</button>
           <button class="lang-btn" data-lang="be" type="button" title="Belgique/België"><span class="flag">🇧🇪</span>BE</button>
         </div>
+      </nav>
+      <div class="header-actions">
         <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-label="Menu">☰</button>
       </div>
     </div>

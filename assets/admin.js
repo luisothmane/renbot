@@ -453,7 +453,7 @@ function renderTickets() {
 
 async function applyAdminTranslations() {
   const T = t();
-  document.title = T.admin.title;
+  document.title = `${T.brand} – ${T.admin.title}`;
   document.documentElement.lang = lang === "be" ? "nl" : lang;
   applyDataI18n(T);
   setFooterYear(T);

@@ -303,7 +303,7 @@ function bindNicknameInput() {
 
 function applyTicketsTranslations() {
   const T = t();
-  document.title = T.tickets.title;
+  document.title = `${T.brand} – ${T.tickets.title}`;
   document.documentElement.lang = lang === "be" ? "nl" : lang;
   applyDataI18n(T);
   document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {

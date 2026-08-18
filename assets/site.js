@@ -33,7 +33,7 @@ function renderJackpotGrid(T) {
 
 function applySiteTranslations() {
   const T = I18N[siteLang];
-  document.title = T.home && T.home.heroTitle ? T.home.heroTitle : T.pageTitle;
+  document.title = T.brand;
   document.documentElement.lang = siteLang === "be" ? "nl" : siteLang;
   applyDataI18n(T);
   setFooterYear(T);

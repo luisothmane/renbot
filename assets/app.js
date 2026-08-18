@@ -204,7 +204,7 @@ function setGame(gameId) {
 
 function applyTranslations() {
   const T = t();
-  document.title = T.pageTitle;
+  document.title = `${T.brand} – ${T.nav.checker}`;
   document.documentElement.lang = STATE.lang === "be" ? "nl" : STATE.lang;
   applyDataI18n(T);
   setFooterYear(T);

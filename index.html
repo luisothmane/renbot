@@ -3,37 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EuroMillions Zahlen-Checker</title>
+  <title>Europa Lotto Zahlen-Checker</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffd23f'/%3E%3Ctext x='50' y='66' font-size='54' text-anchor='middle' font-family='sans-serif'%3E%F0%9F%8D%80%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
-  <header>
-    <div class="lang-switch">
-      <button class="lang-btn" data-lang="de" type="button">🇩🇪 Deutsch</button>
-      <button class="lang-btn" data-lang="fr" type="button">🇫🇷 Français</button>
-      <button class="lang-btn" data-lang="nl" type="button">🇳🇱 Nederlands</button>
-      <button class="lang-btn" data-lang="be" type="button">🇧🇪 Belgique/België</button>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" data-i18n="brand">Lotto Checker</div>
+      <div class="lang-switch">
+        <button class="lang-btn" data-lang="de" type="button">🇩🇪 Deutsch</button>
+        <button class="lang-btn" data-lang="fr" type="button">🇫🇷 Français</button>
+        <button class="lang-btn" data-lang="nl" type="button">🇳🇱 Nederlands</button>
+        <button class="lang-btn" data-lang="be" type="button">🇧🇪 Belgique/België</button>
+      </div>
     </div>
-    <h1 data-i18n="headerTitle">EuroMillions Zahlen-Checker</h1>
-    <p data-i18n="headerSubtitle">Gib deine Tipp-Zahlen und die Ziehungszahlen ein.</p>
+  </div>
+
+  <header>
+    <h1 data-i18n="headerTitle">Europa Lotto Zahlen-Checker</h1>
+    <p data-i18n="headerSubtitle">Wähle eine Lotterie und prüfe deine Zahlen.</p>
   </header>
 
   <main>
+    <section class="game-select-panel">
+      <p class="section-kicker" data-i18n="gameSelectorLabel">Lotterie wählen</p>
+      <div class="game-switch" id="gameSwitch"></div>
+    </section>
+
     <section class="panel">
       <h2 data-i18n="yourNumbersTitle">1. Deine getippten Zahlen</h2>
-      <p class="hint" data-i18n="yourNumbersHint">Wähle 5 Zahlen und 2 Sterne.</p>
+      <p class="hint" id="yourNumbersHint">Wähle deine Zahlen.</p>
 
       <div class="group-label">
         <span data-i18n="mainNumbersLabel">Zahlen</span>
         <span class="count" id="yourMainCount">0 / 5</span>
       </div>
-      <div class="grid" id="yourMainGrid" data-count="main"></div>
+      <div class="grid" id="yourMainGrid"></div>
 
-      <div class="group-label">
-        <span data-i18n="starsLabel">Sterne</span>
-        <span class="count" id="yourStarsCount">0 / 2</span>
+      <div class="bonus-section">
+        <div class="group-label">
+          <span id="yourBonusLabel">Sterne</span>
+          <span class="count" id="yourBonusCount">0 / 2</span>
+        </div>
+        <div class="grid grid-bonus" id="yourBonusGrid"></div>
       </div>
-      <div class="grid" id="yourStarsGrid" data-count="stars"></div>
     </section>
 
     <section class="panel">
@@ -44,13 +61,15 @@
         <span data-i18n="mainNumbersLabel">Zahlen</span>
         <span class="count" id="winMainCount">0 / 5</span>
       </div>
-      <div class="grid" id="winMainGrid" data-count="main"></div>
+      <div class="grid" id="winMainGrid"></div>
 
-      <div class="group-label">
-        <span data-i18n="starsLabel">Sterne</span>
-        <span class="count" id="winStarsCount">0 / 2</span>
+      <div class="bonus-section">
+        <div class="group-label">
+          <span id="winBonusLabel">Sterne</span>
+          <span class="count" id="winBonusCount">0 / 2</span>
+        </div>
+        <div class="grid grid-bonus" id="winBonusGrid"></div>
       </div>
-      <div class="grid" id="winStarsGrid" data-count="stars"></div>
 
       <div class="example-row">
         <label for="exampleSelect" data-i18n="exampleDrawsLabel">Beispiel-Ziehung laden:</label>
@@ -78,6 +97,7 @@
     <p data-i18n="footerNote"></p>
   </footer>
 
+  <script src="assets/games.js"></script>
   <script src="assets/i18n.js"></script>
   <script src="assets/app.js"></script>
 </body>

@@ -1,22 +1,23 @@
 const STATE = {
   lang: localStorage.getItem("lang") || "de",
+  gameId: localStorage.getItem("game") || "euromillions",
   yourMain: new Set(),
-  yourStars: new Set(),
+  yourBonus: new Set(),
   winMain: new Set(),
-  winStars: new Set()
+  winBonus: new Set()
 };
-
-const MAIN_MAX = 5;
-const STAR_MAX = 2;
 
 function t() {
   return I18N[STATE.lang];
 }
 
-function buildGrid(container, max, setRef, onChange) {
+function game() {
+  return GAME_SPECS[STATE.gameId];
+}
+
+function buildGrid(container, min, max, maxCount, setRef, onChange) {
   container.innerHTML = "";
-  const count = container.dataset.count === "stars" ? 12 : 50;
-  for (let i = 1; i <= count; i++) {
+  for (let i = min; i <= max; i++) {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "num-btn";
@@ -27,7 +28,7 @@ function buildGrid(container, max, setRef, onChange) {
         setRef.delete(i);
         btn.classList.remove("selected");
       } else {
-        if (setRef.size >= max) return;
+        if (setRef.size >= maxCount) return;
         setRef.add(i);
         btn.classList.add("selected");
       }
@@ -46,32 +47,53 @@ function syncGridVisual(container, setRef) {
 
 function updateCounts() {
   const T = t();
-  document.getElementById("yourMainCount").textContent = T.countLabel(STATE.yourMain.size, MAIN_MAX);
-  document.getElementById("yourStarsCount").textContent = T.countLabel(STATE.yourStars.size, STAR_MAX);
-  document.getElementById("winMainCount").textContent = T.countLabel(STATE.winMain.size, MAIN_MAX);
-  document.getElementById("winStarsCount").textContent = T.countLabel(STATE.winStars.size, STAR_MAX);
+  const g = game();
+  document.getElementById("yourMainCount").textContent = T.countLabel(STATE.yourMain.size, g.mainCount);
+  document.getElementById("winMainCount").textContent = T.countLabel(STATE.winMain.size, g.mainCount);
+  if (g.bonusCount > 0) {
+    document.getElementById("yourBonusCount").textContent = T.countLabel(STATE.yourBonus.size, g.bonusCount);
+    document.getElementById("winBonusCount").textContent = T.countLabel(STATE.winBonus.size, g.bonusCount);
+  }
 }
 
-function computeTierKey(mainMatches, starMatches) {
-  const key = `${mainMatches}+${starMatches}`;
-  const validKeys = new Set([
-    "5+2", "5+1", "5+0", "4+2", "4+1", "3+2", "4+0",
-    "2+2", "3+1", "3+0", "1+2", "2+1", "2+0"
-  ]);
-  return validKeys.has(key) ? key : null;
+function findTier(g, mainMatches, bonusMatches) {
+  for (let i = 0; i < g.tiers.length; i++) {
+    const [m, b] = g.tiers[i];
+    if (m === mainMatches && (g.bonusCount === 0 || b === bonusMatches)) {
+      return { rank: i + 1, main: m, bonus: b, isJackpot: i === 0 };
+    }
+  }
+  return null;
+}
+
+function tierLabel(T, g, gameId, tier) {
+  const gameT = T.games[gameId];
+  let desc = `${tier.main} ${T.mainNumbersLabel}`;
+  if (g.bonusCount > 0) {
+    desc += ` + ${tier.bonus} ${gameT.bonusLabel}`;
+  }
+  let label = `${T.rankWord} ${tier.rank}`;
+  if (tier.isJackpot) label += T.jackpotSuffix;
+  return `${label} (${desc})`;
+}
+
+function isComplete() {
+  const g = game();
+  return (
+    STATE.yourMain.size === g.mainCount &&
+    STATE.yourBonus.size === g.bonusCount &&
+    STATE.winMain.size === g.mainCount &&
+    STATE.winBonus.size === g.bonusCount
+  );
 }
 
 function showResult() {
   const T = t();
+  const g = game();
   const resultPanel = document.getElementById("resultPanel");
   const warning = document.getElementById("incompleteWarning");
 
-  if (
-    STATE.yourMain.size !== MAIN_MAX ||
-    STATE.yourStars.size !== STAR_MAX ||
-    STATE.winMain.size !== MAIN_MAX ||
-    STATE.winStars.size !== STAR_MAX
-  ) {
+  if (!isComplete()) {
     warning.textContent = T.incompleteWarning;
     warning.hidden = false;
     resultPanel.hidden = true;
@@ -80,21 +102,22 @@ function showResult() {
   warning.hidden = true;
 
   const mainMatches = [...STATE.yourMain].filter((n) => STATE.winMain.has(n));
-  const starMatches = [...STATE.yourStars].filter((n) => STATE.winStars.has(n));
-  const tierKey = computeTierKey(mainMatches.length, starMatches.length);
+  const bonusMatches = [...STATE.yourBonus].filter((n) => STATE.winBonus.has(n));
+  const tier = findTier(g, mainMatches.length, bonusMatches.length);
 
   resultPanel.hidden = false;
-  resultPanel.classList.toggle("win", !!tierKey);
-  resultPanel.classList.toggle("no-win", !tierKey);
+  resultPanel.classList.toggle("win", !!tier);
+  resultPanel.classList.toggle("no-win", !tier);
 
-  document.getElementById("resultSummary").textContent = T.matchSummary(mainMatches.length, starMatches.length);
+  document.getElementById("resultSummary").textContent =
+    T.matchSummary(mainMatches.length, g.mainCount, bonusMatches.length, g.bonusCount);
 
   const tierEl = document.getElementById("resultTier");
   const messageEl = document.getElementById("resultMessage");
 
-  if (tierKey) {
+  if (tier) {
     tierEl.hidden = false;
-    tierEl.textContent = `${T.tierPrefix} ${T.tiers[tierKey]}`;
+    tierEl.textContent = `${T.tierPrefix} ${tierLabel(T, g, STATE.gameId, tier)}`;
     messageEl.textContent = T.winMessage;
   } else {
     tierEl.hidden = true;
@@ -102,9 +125,9 @@ function showResult() {
   }
 
   highlightMatches("yourMainGrid", mainMatches);
-  highlightMatches("yourStarsGrid", starMatches);
+  highlightMatches("yourBonusGrid", bonusMatches);
   highlightMatches("winMainGrid", mainMatches);
-  highlightMatches("winStarsGrid", starMatches);
+  highlightMatches("winBonusGrid", bonusMatches);
 
   resultPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
@@ -121,46 +144,105 @@ function clearHighlights() {
   document.querySelectorAll(".num-btn.match").forEach((btn) => btn.classList.remove("match"));
 }
 
-function resetAll() {
-  STATE.yourMain.clear();
-  STATE.yourStars.clear();
-  STATE.winMain.clear();
-  STATE.winStars.clear();
-  syncGridVisual(document.getElementById("yourMainGrid"), STATE.yourMain);
-  syncGridVisual(document.getElementById("yourStarsGrid"), STATE.yourStars);
-  syncGridVisual(document.getElementById("winMainGrid"), STATE.winMain);
-  syncGridVisual(document.getElementById("winStarsGrid"), STATE.winStars);
-  clearHighlights();
-  updateCounts();
+function clearResultUI() {
   document.getElementById("resultPanel").hidden = true;
   document.getElementById("incompleteWarning").hidden = true;
+}
+
+function resetAll() {
+  STATE.yourMain.clear();
+  STATE.yourBonus.clear();
+  STATE.winMain.clear();
+  STATE.winBonus.clear();
+  syncGridVisual(document.getElementById("yourMainGrid"), STATE.yourMain);
+  syncGridVisual(document.getElementById("yourBonusGrid"), STATE.yourBonus);
+  syncGridVisual(document.getElementById("winMainGrid"), STATE.winMain);
+  syncGridVisual(document.getElementById("winBonusGrid"), STATE.winBonus);
+  clearHighlights();
+  updateCounts();
+  clearResultUI();
   document.getElementById("exampleSelect").value = "";
 }
 
 function loadExampleDraw(index) {
   if (index === "" || index === null) return;
-  const draw = t().exampleDraws[Number(index)];
+  const draw = game().examples[Number(index)];
   if (!draw) return;
   STATE.winMain = new Set(draw.main);
-  STATE.winStars = new Set(draw.stars);
+  STATE.winBonus = new Set(draw.bonus);
   syncGridVisual(document.getElementById("winMainGrid"), STATE.winMain);
-  syncGridVisual(document.getElementById("winStarsGrid"), STATE.winStars);
+  syncGridVisual(document.getElementById("winBonusGrid"), STATE.winBonus);
   clearHighlights();
   updateCounts();
-  document.getElementById("resultPanel").hidden = true;
-  document.getElementById("incompleteWarning").hidden = true;
+  clearResultUI();
 }
 
 function populateExampleSelect() {
   const select = document.getElementById("exampleSelect");
   const T = t();
   select.innerHTML = `<option value="">${T.exampleDrawsPlaceholder}</option>`;
-  T.exampleDraws.forEach((draw, i) => {
+  game().examples.forEach((draw, i) => {
     const opt = document.createElement("option");
     opt.value = i;
-    opt.textContent = draw.label;
+    opt.textContent = T.exampleLabel(i + 1);
     select.appendChild(opt);
   });
+}
+
+function renderGameTabs() {
+  const T = t();
+  const container = document.getElementById("gameSwitch");
+  container.innerHTML = "";
+  GAME_ORDER.forEach((id) => {
+    const spec = GAME_SPECS[id];
+    const info = T.games[id];
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "game-btn" + (id === STATE.gameId ? " active" : "");
+    btn.dataset.game = id;
+    btn.innerHTML = `<span class="game-icon">${spec.icon}</span><span>${info.name}</span>`;
+    btn.addEventListener("click", () => setGame(id));
+    container.appendChild(btn);
+  });
+}
+
+function applyGameLayout() {
+  const g = game();
+  const T = t();
+  const gameT = T.games[STATE.gameId];
+
+  buildGrid(document.getElementById("yourMainGrid"), g.mainMin, g.mainMax, g.mainCount, STATE.yourMain, updateCounts);
+  buildGrid(document.getElementById("winMainGrid"), g.mainMin, g.mainMax, g.mainCount, STATE.winMain, updateCounts);
+
+  const bonusSections = document.querySelectorAll(".bonus-section");
+  if (g.bonusCount > 0) {
+    bonusSections.forEach((el) => (el.hidden = false));
+    buildGrid(document.getElementById("yourBonusGrid"), g.bonusMin, g.bonusMax, g.bonusCount, STATE.yourBonus, updateCounts);
+    buildGrid(document.getElementById("winBonusGrid"), g.bonusMin, g.bonusMax, g.bonusCount, STATE.winBonus, updateCounts);
+    document.getElementById("yourBonusLabel").textContent = gameT.bonusLabel;
+    document.getElementById("winBonusLabel").textContent = gameT.bonusLabel;
+  } else {
+    bonusSections.forEach((el) => (el.hidden = true));
+    document.getElementById("yourBonusGrid").innerHTML = "";
+    document.getElementById("winBonusGrid").innerHTML = "";
+  }
+
+  document.getElementById("yourNumbersHint").textContent = T.yourNumbersHint(g.mainCount, g.bonusCount);
+
+  populateExampleSelect();
+  updateCounts();
+  clearResultUI();
+}
+
+function setGame(gameId) {
+  STATE.gameId = gameId;
+  localStorage.setItem("game", gameId);
+  STATE.yourMain.clear();
+  STATE.yourBonus.clear();
+  STATE.winMain.clear();
+  STATE.winBonus.clear();
+  renderGameTabs();
+  applyGameLayout();
 }
 
 function applyTranslations() {
@@ -169,16 +251,11 @@ function applyTranslations() {
   document.documentElement.lang = STATE.lang === "be" ? "nl" : STATE.lang;
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.dataset.i18n;
-    if (T[key] !== undefined) el.textContent = T[key];
+    if (typeof T[key] === "string") el.textContent = T[key];
   });
-  populateExampleSelect();
-  updateCounts();
-  document.getElementById("incompleteWarning").hidden = true;
 
-  const resultPanel = document.getElementById("resultPanel");
-  if (!resultPanel.hidden) {
-    showResult();
-  }
+  renderGameTabs();
+  applyGameLayout();
 
   document.querySelectorAll(".lang-btn").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.lang === STATE.lang);
@@ -192,11 +269,6 @@ function setLang(lang) {
 }
 
 function init() {
-  buildGrid(document.getElementById("yourMainGrid"), MAIN_MAX, STATE.yourMain, updateCounts);
-  buildGrid(document.getElementById("yourStarsGrid"), STAR_MAX, STATE.yourStars, updateCounts);
-  buildGrid(document.getElementById("winMainGrid"), MAIN_MAX, STATE.winMain, updateCounts);
-  buildGrid(document.getElementById("winStarsGrid"), STAR_MAX, STATE.winStars, updateCounts);
-
   document.getElementById("checkBtn").addEventListener("click", showResult);
   document.getElementById("resetBtn").addEventListener("click", resetAll);
   document.getElementById("exampleSelect").addEventListener("change", (e) => loadExampleDraw(e.target.value));

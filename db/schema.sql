@@ -1,11 +1,11 @@
 -- Run this once in phpMyAdmin (or `mysql -u ... -p yourdb < schema.sql`)
 -- against the database you created for this site on Namecheap.
 --
--- If you already ran an older version of this file (before the
--- is_admin / draws feature existed), just run these two statements
--- instead of the whole file:
+-- If you already ran an older version of this file, just run whichever
+-- of these you're missing instead of the whole file:
 --   ALTER TABLE users ADD COLUMN is_admin TINYINT(1) NOT NULL DEFAULT 0;
---   -- then the CREATE TABLE draws statement below.
+--   ALTER TABLE tickets ADD COLUMN status_override VARCHAR(10) DEFAULT NULL;
+--   -- then the CREATE TABLE draws statement below (if you don't have it yet).
 
 CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -27,6 +27,9 @@ CREATE TABLE IF NOT EXISTS tickets (
   main_numbers JSON NOT NULL,
   bonus_numbers JSON NOT NULL,
   created_at DATETIME NOT NULL,
+  -- Set by an admin to override the auto-computed win/loss status
+  -- ('win', 'loss', or NULL to fall back to matching against draws).
+  status_override VARCHAR(10) DEFAULT NULL,
   CONSTRAINT fk_tickets_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

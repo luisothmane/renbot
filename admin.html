@@ -82,6 +82,7 @@
                 <th data-i18n="admin.colRegistered">Registriert am</th>
                 <th data-i18n="admin.colTickets">Tickets</th>
                 <th data-i18n="admin.colAdmin">Admin</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="usersTableBody"></tbody>
@@ -91,7 +92,58 @@
       </section>
 
       <section class="panel">
-        <h2 data-i18n="admin.addDrawTitle">Neue Ziehung erfassen</h2>
+        <h2 data-i18n="admin.addUserTitle">Neuen Nutzer anlegen</h2>
+        <div class="ticket-form-row">
+          <div class="field">
+            <label data-i18n="depot.firstNameLabel">Vorname</label>
+            <input type="text" id="newUserFirstName" />
+          </div>
+          <div class="field">
+            <label data-i18n="depot.lastNameLabel">Nachname</label>
+            <input type="text" id="newUserLastName" />
+          </div>
+        </div>
+        <div class="ticket-form-row">
+          <div class="field">
+            <label data-i18n="depot.emailLabel">E-Mail</label>
+            <input type="email" id="newUserEmail" />
+          </div>
+          <div class="field">
+            <label data-i18n="depot.passwordLabel">Passwort</label>
+            <input type="password" id="newUserPassword" minlength="8" />
+          </div>
+        </div>
+        <div class="ticket-form-row">
+          <div class="field">
+            <label data-i18n="depot.addressLabel">Straße &amp; Hausnummer</label>
+            <input type="text" id="newUserAddress" />
+          </div>
+        </div>
+        <div class="ticket-form-row">
+          <div class="field">
+            <label data-i18n="depot.postalCodeLabel">Postleitzahl</label>
+            <input type="text" id="newUserPostalCode" style="min-width:120px;" />
+          </div>
+          <div class="field">
+            <label data-i18n="depot.cityLabel">Ort</label>
+            <input type="text" id="newUserCity" />
+          </div>
+        </div>
+        <div class="ticket-form-row">
+          <label style="display:flex; align-items:center; gap:0.5rem; font-weight:500; font-size:0.9rem;">
+            <input type="checkbox" id="newUserIsAdmin" style="width:auto;" />
+            <span data-i18n="admin.isAdminLabel">Admin-Rechte geben</span>
+          </label>
+        </div>
+        <p class="warning" id="newUserWarning" hidden></p>
+        <div class="actions" style="justify-content:flex-start; margin-top:0.8rem;">
+          <button class="btn btn-primary" id="createUserBtn" type="button" data-i18n="admin.createUserButton">Nutzer anlegen</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 id="drawFormTitle" data-i18n="admin.addDrawTitle">Neue Ziehung erfassen</h2>
+        <p class="hint" id="editingDrawNote" data-i18n="admin.editingDrawNote" hidden></p>
         <p class="hint" data-i18n="tickets.chooseGameLabel">Lotterie</p>
         <div class="game-switch" id="drawGameSwitch"></div>
 
@@ -120,6 +172,7 @@
 
         <div class="actions" style="margin-top:1.2rem;">
           <button class="btn btn-primary" id="addDrawBtn" type="button" data-i18n="admin.addDrawButton">Ziehung speichern</button>
+          <button class="btn btn-secondary" id="cancelEditDrawBtn" type="button" data-i18n="admin.cancelEditLabel" hidden>Abbrechen</button>
         </div>
       </section>
 
@@ -153,6 +206,7 @@
                 <th data-i18n="admin.colNumbers">Zahlen</th>
                 <th data-i18n="admin.colPlayed">Gespielt am</th>
                 <th data-i18n="admin.colStatus">Status</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="ticketsTableBody"></tbody>

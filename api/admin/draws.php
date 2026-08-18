@@ -45,6 +45,27 @@ if ($method === 'POST') {
     exit;
 }
 
+if ($method === 'PUT') {
+    $id = (int) ($_GET['id'] ?? 0);
+    $input = json_body();
+    $gameId = (string) ($input['gameId'] ?? '');
+    $main = is_array($input['main'] ?? null) ? array_map('intval', array_values($input['main'])) : [];
+    $bonus = is_array($input['bonus'] ?? null) ? array_map('intval', array_values($input['bonus'])) : [];
+    $drawDate = (string) ($input['drawDate'] ?? '');
+
+    if ($id <= 0 || !in_array($gameId, $allowedGames, true) || empty($main) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $drawDate)) {
+        http_response_code(422);
+        echo json_encode(['error' => 'invalid_draw']);
+        exit;
+    }
+
+    $stmt = $pdo->prepare('UPDATE draws SET game_id = ?, main_numbers = ?, bonus_numbers = ?, draw_date = ? WHERE id = ?');
+    $stmt->execute([$gameId, json_encode($main), json_encode($bonus), $drawDate, $id]);
+
+    echo json_encode(['ok' => true]);
+    exit;
+}
+
 if ($method === 'DELETE') {
     $id = (int) ($_GET['id'] ?? 0);
     $stmt = $pdo->prepare('DELETE FROM draws WHERE id = ?');

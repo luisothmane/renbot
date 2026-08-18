@@ -2,6 +2,8 @@ let lang = getStoredLang();
 let draws = [];
 let ticketsData = [];
 let usersData = [];
+let currentUserEmail = null;
+let editingDrawId = null;
 const drawGameId = { value: "euromillions" };
 const drawMain = new Set();
 const drawBonus = new Set();
@@ -57,6 +59,7 @@ async function checkAccess() {
     panel.hidden = true;
     return false;
   }
+  currentUserEmail = data.user.email;
   gateOut.hidden = true;
   gateNotAdmin.hidden = true;
   panel.hidden = false;
@@ -117,13 +120,72 @@ function renderUsers() {
       <td>${formatDate(u.createdAt)}</td>
       <td>${u.ticketCount}</td>
       <td>${u.isAdmin ? "✅" : "—"}</td>
+      <td></td>
     `;
+    if (u.email !== currentUserEmail) {
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn-sm danger";
+      delBtn.type = "button";
+      delBtn.textContent = T.admin.deleteUserLabel;
+      delBtn.addEventListener("click", () => deleteUser(u.id));
+      tr.lastElementChild.appendChild(delBtn);
+    }
     body.appendChild(tr);
   });
   document.getElementById("statUsers").textContent = usersData.length;
 }
 
-/* ---------- Draw add form ---------- */
+async function createUser() {
+  const T = t();
+  const warn = document.getElementById("newUserWarning");
+  warn.hidden = true;
+
+  const payload = {
+    email: document.getElementById("newUserEmail").value.trim(),
+    password: document.getElementById("newUserPassword").value,
+    firstName: document.getElementById("newUserFirstName").value.trim(),
+    lastName: document.getElementById("newUserLastName").value.trim(),
+    address: document.getElementById("newUserAddress").value.trim(),
+    postalCode: document.getElementById("newUserPostalCode").value.trim(),
+    city: document.getElementById("newUserCity").value.trim(),
+    isAdmin: document.getElementById("newUserIsAdmin").checked
+  };
+
+  const { ok, data } = await api("api/admin/users.php", { method: "POST", body: JSON.stringify(payload) });
+  if (!ok) {
+    const map = {
+      invalid_email: T.depot.errorInvalidEmail,
+      password_too_short: T.depot.errorPasswordShort,
+      email_taken: T.depot.errorEmailTaken
+    };
+    warn.textContent = map[data.error] || T.depot.errorGeneric;
+    warn.hidden = false;
+    return;
+  }
+
+  ["newUserEmail", "newUserPassword", "newUserFirstName", "newUserLastName", "newUserAddress", "newUserPostalCode", "newUserCity"].forEach((id) => {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("newUserIsAdmin").checked = false;
+
+  await loadUsers();
+  renderStats();
+}
+
+async function deleteUser(id) {
+  const T = t();
+  if (!confirm(T.admin.deleteUserConfirm)) return;
+  const { ok, data } = await api(`api/admin/users.php?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+  if (!ok && data.error === "cannot_delete_self") {
+    alert(T.admin.errorCannotDeleteSelf);
+    return;
+  }
+  await loadUsers();
+  await loadTickets();
+  renderStats();
+}
+
+/* ---------- Draw add/edit form ---------- */
 
 function renderDrawGameSwitch() {
   const T = t();
@@ -176,7 +238,39 @@ function applyDrawLayout() {
   document.getElementById("drawWarning").hidden = true;
 }
 
-async function addDraw() {
+function startEditDraw(draw) {
+  editingDrawId = draw.id;
+  drawGameId.value = draw.gameId;
+  drawMain.clear();
+  draw.main.forEach((n) => drawMain.add(n));
+  drawBonus.clear();
+  (draw.bonus || []).forEach((n) => drawBonus.add(n));
+  renderDrawGameSwitch();
+  applyDrawLayout();
+  document.getElementById("drawDateInput").value = draw.drawDate;
+  updateDrawFormMode();
+  document.getElementById("drawFormTitle").scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function cancelEditDraw() {
+  editingDrawId = null;
+  drawMain.clear();
+  drawBonus.clear();
+  applyDrawLayout();
+  document.getElementById("drawDateInput").value = "";
+  updateDrawFormMode();
+}
+
+function updateDrawFormMode() {
+  const T = t();
+  const isEditing = editingDrawId !== null;
+  document.getElementById("drawFormTitle").textContent = isEditing ? T.admin.editDrawLabel : T.admin.addDrawTitle;
+  document.getElementById("editingDrawNote").hidden = !isEditing;
+  document.getElementById("addDrawBtn").textContent = isEditing ? T.admin.updateDrawButton : T.admin.addDrawButton;
+  document.getElementById("cancelEditDrawBtn").hidden = !isEditing;
+}
+
+async function saveDraw() {
   const T = t();
   const spec = GAME_SPECS[drawGameId.value];
   const dateVal = document.getElementById("drawDateInput").value;
@@ -189,27 +283,32 @@ async function addDraw() {
   }
   warn.hidden = true;
 
-  const { ok } = await api("api/admin/draws.php", {
-    method: "POST",
-    body: JSON.stringify({
-      gameId: drawGameId.value,
-      main: [...drawMain].sort((a, b) => a - b),
-      bonus: [...drawBonus].sort((a, b) => a - b),
-      drawDate: dateVal
-    })
-  });
+  const payload = {
+    gameId: drawGameId.value,
+    main: [...drawMain].sort((a, b) => a - b),
+    bonus: [...drawBonus].sort((a, b) => a - b),
+    drawDate: dateVal
+  };
+
+  const { ok } = editingDrawId
+    ? await api(`api/admin/draws.php?id=${encodeURIComponent(editingDrawId)}`, { method: "PUT", body: JSON.stringify(payload) })
+    : await api("api/admin/draws.php", { method: "POST", body: JSON.stringify(payload) });
+
   if (!ok) return;
 
+  editingDrawId = null;
   drawMain.clear();
   drawBonus.clear();
   applyDrawLayout();
   document.getElementById("drawDateInput").value = "";
+  updateDrawFormMode();
   await loadDraws();
   renderStats();
 }
 
 async function removeDraw(id) {
   await api(`api/admin/draws.php?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+  if (editingDrawId === id) cancelEditDraw();
   await loadDraws();
   renderStats();
 }
@@ -235,11 +334,18 @@ function renderDraws() {
       <td>${formatDate(d.drawDate)}</td>
       <td></td>
     `;
+    const editBtn = document.createElement("button");
+    editBtn.className = "btn-sm";
+    editBtn.type = "button";
+    editBtn.textContent = T.admin.editDrawLabel;
+    editBtn.style.marginRight = "0.5rem";
+    editBtn.addEventListener("click", () => startEditDraw(d));
     const delBtn = document.createElement("button");
     delBtn.className = "btn-sm danger";
     delBtn.type = "button";
     delBtn.textContent = T.admin.deleteLabel;
     delBtn.addEventListener("click", () => removeDraw(d.id));
+    tr.lastElementChild.appendChild(editBtn);
     tr.lastElementChild.appendChild(delBtn);
     body.appendChild(tr);
   });
@@ -258,6 +364,11 @@ function latestDrawByGame() {
   return map;
 }
 
+async function setTicketStatus(id, status) {
+  await api("api/admin/tickets.php", { method: "PATCH", body: JSON.stringify({ id, status }) });
+  await loadTickets();
+}
+
 function renderTickets() {
   const T = t();
   const body = document.getElementById("ticketsTableBody");
@@ -274,16 +385,27 @@ function renderTickets() {
   ticketsData.forEach((ticket) => {
     const spec = GAME_SPECS[ticket.gameId];
     const info = T.games[ticket.gameId];
-    const draw = latest[ticket.gameId];
 
-    let statusHtml = `<span class="status-pill pending">${T.admin.statusPending}</span>`;
-    if (draw) {
-      const mainMatches = ticket.main.filter((n) => draw.main.includes(n));
-      const bonusMatches = ticket.bonus.filter((n) => draw.bonus.includes(n));
-      const tier = findTier(spec, mainMatches.length, bonusMatches.length);
-      statusHtml = tier
-        ? `<span class="status-pill win">${T.admin.statusWin}</span>`
-        : `<span class="status-pill loss">${T.admin.statusLoss}</span>`;
+    let isWin = null;
+    let manual = false;
+    if (ticket.statusOverride === "win" || ticket.statusOverride === "loss") {
+      isWin = ticket.statusOverride === "win";
+      manual = true;
+    } else {
+      const draw = latest[ticket.gameId];
+      if (draw) {
+        const mainMatches = ticket.main.filter((n) => draw.main.includes(n));
+        const bonusMatches = ticket.bonus.filter((n) => draw.bonus.includes(n));
+        isWin = !!findTier(spec, mainMatches.length, bonusMatches.length);
+      }
+    }
+
+    let statusHtml;
+    if (isWin === null) {
+      statusHtml = `<span class="status-pill pending">${T.admin.statusPending}</span>`;
+    } else {
+      statusHtml = `<span class="status-pill ${isWin ? "win" : "loss"}">${isWin ? T.admin.statusWin : T.admin.statusLoss}</span>`;
+      if (manual) statusHtml += ` <span class="ticket-meta">(${T.admin.manualBadge})</span>`;
     }
 
     const name = [ticket.user.firstName, ticket.user.lastName].filter(Boolean).join(" ") || ticket.user.email;
@@ -294,7 +416,35 @@ function renderTickets() {
       <td>${numbersToText(ticket.main, ticket.bonus)}</td>
       <td>${formatDate(ticket.createdAt)}</td>
       <td>${statusHtml}</td>
+      <td></td>
     `;
+
+    const winBtn = document.createElement("button");
+    winBtn.className = "btn-sm";
+    winBtn.type = "button";
+    winBtn.textContent = T.admin.markWinLabel;
+    winBtn.addEventListener("click", () => setTicketStatus(ticket.id, "win"));
+
+    const lossBtn = document.createElement("button");
+    lossBtn.className = "btn-sm";
+    lossBtn.type = "button";
+    lossBtn.textContent = T.admin.markLossLabel;
+    lossBtn.style.margin = "0 0.4rem";
+    lossBtn.addEventListener("click", () => setTicketStatus(ticket.id, "loss"));
+
+    const actionsCell = tr.lastElementChild;
+    actionsCell.appendChild(winBtn);
+    actionsCell.appendChild(lossBtn);
+
+    if (manual) {
+      const resetBtn = document.createElement("button");
+      resetBtn.className = "btn-sm";
+      resetBtn.type = "button";
+      resetBtn.textContent = T.admin.resetStatusLabel;
+      resetBtn.addEventListener("click", () => setTicketStatus(ticket.id, null));
+      actionsCell.appendChild(resetBtn);
+    }
+
     body.appendChild(tr);
   });
 }
@@ -315,6 +465,7 @@ async function applyAdminTranslations() {
   if (isAdmin) {
     renderDrawGameSwitch();
     applyDrawLayout();
+    updateDrawFormMode();
     await loadAll();
   }
 }
@@ -327,7 +478,9 @@ function setAdminLang(newLang) {
 function initAdmin() {
   bindLangButtons(setAdminLang);
   bindMobileNav();
-  document.getElementById("addDrawBtn").addEventListener("click", addDraw);
+  document.getElementById("addDrawBtn").addEventListener("click", saveDraw);
+  document.getElementById("cancelEditDrawBtn").addEventListener("click", cancelEditDraw);
+  document.getElementById("createUserBtn").addEventListener("click", createUser);
   applyAdminTranslations();
 }
 

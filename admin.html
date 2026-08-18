@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Euro Tipp – Admin</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25' r='75%25'%3E%3Cstop offset='0%25' stop-color='%23ffe08a'/%3E%3Cstop offset='100%25' stop-color='%23c9781a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='url(%23g)'/%3E%3Ctext x='50' y='68' font-family='Arial, sans-serif' font-weight='800' font-size='54' text-anchor='middle' fill='%23241a00'%3E%E2%82%AC%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body data-page="admin">
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">€</span><span data-i18n="brand">Lotto Checker</span></a>
+      <nav class="site-nav" id="siteNav">
+        <a class="nav-link" data-nav="home" href="index.html" data-i18n="nav.home">Startseite</a>
+        <a class="nav-link" data-nav="checker" href="checker.html" data-i18n="nav.checker">Zahlen-Checker</a>
+        <a class="nav-link" data-nav="tickets" href="tickets.html" data-i18n="nav.tickets">Meine Tickets</a>
+        <a class="nav-link" data-nav="depot" href="depot.html" data-i18n="nav.depot">Mein Depot</a>
+        <div class="lang-switch">
+          <button class="lang-btn" data-lang="de" type="button" title="Deutsch"><span class="flag">🇩🇪</span>DE</button>
+          <button class="lang-btn" data-lang="fr" type="button" title="Français"><span class="flag">🇫🇷</span>FR</button>
+          <button class="lang-btn" data-lang="nl" type="button" title="Nederlands"><span class="flag">🇳🇱</span>NL</button>
+          <button class="lang-btn" data-lang="be" type="button" title="Belgique/België"><span class="flag">🇧🇪</span>BE</button>
+        </div>
+      </nav>
+      <div class="header-actions">
+        <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-label="Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-head">
+      <p class="section-kicker" data-i18n="admin.title">Admin-Bereich</p>
+      <h1 data-i18n="admin.title">Admin-Bereich</h1>
+      <p data-i18n="admin.subtitle">Nutzer, Tickets und Status im Überblick.</p>
+    </div>
+
+    <section class="panel admin-gate" id="gateLoggedOut" hidden>
+      <p data-i18n="admin.loginRequired">Bitte melde dich zuerst an.</p>
+      <div class="actions" style="margin-top:1rem;">
+        <a class="btn btn-primary" href="depot.html" data-i18n="depot.loginTab">Anmelden</a>
+      </div>
+    </section>
+
+    <section class="panel admin-gate" id="gateNotAdmin" hidden>
+      <p data-i18n="admin.notAuthorized">Dieses Konto hat keine Admin-Rechte.</p>
+      <div class="actions" style="margin-top:1rem;">
+        <a class="btn btn-secondary" href="depot.html" data-i18n="admin.backToDepot">Zum Depot</a>
+      </div>
+    </section>
+
+    <section id="adminPanel" hidden>
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-value" id="statUsers">0</div>
+          <div class="stat-label" data-i18n="admin.statsUsersLabel">Registrierte Nutzer</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statTickets">0</div>
+          <div class="stat-label" data-i18n="admin.statsTicketsLabel">Gespielte Tickets</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statDraws">0</div>
+          <div class="stat-label" data-i18n="admin.statsDrawsLabel">Erfasste Ziehungen</div>
+        </div>
+      </div>
+
+      <section class="panel">
+        <h2 data-i18n="admin.usersTitle">Nutzer</h2>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th data-i18n="admin.colEmail">E-Mail</th>
+                <th data-i18n="admin.colName">Name</th>
+                <th data-i18n="admin.colCity">Ort</th>
+                <th data-i18n="admin.colRegistered">Registriert am</th>
+                <th data-i18n="admin.colTickets">Tickets</th>
+                <th data-i18n="admin.colAdmin">Admin</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+        <p class="empty-state" id="usersEmpty" data-i18n="admin.noUsersMessage" hidden></p>
+      </section>
+
+      <section class="panel">
+        <h2 data-i18n="admin.addUserTitle">Neuen Nutzer anlegen</h2>
+        <div class="ticket-form-row">
+          <div class="field">
+            <label data-i18n="depot.firstNameLabel">Vorname</label>
+            <input type="text" id="newUserFirstName" />
+          </div>
+          <div class="field">
+            <label data-i18n="depot.lastNameLabel">Nachname</label>
+            <input type="text" id="newUserLastName" />
+          </div>
+        </div>
+        <div class="ticket-form-row">
+          <div class="field">
+            <label data-i18n="depot.emailLabel">E-Mail</label>
+            <input type="email" id="newUserEmail" />
+          </div>
+          <div class="field">
+            <label data-i18n="depot.passwordLabel">Passwort</label>
+            <input type="password" id="newUserPassword" minlength="8" />
+          </div>
+        </div>
+        <div class="ticket-form-row">
+          <div class="field">
+            <label data-i18n="depot.addressLabel">Straße &amp; Hausnummer</label>
+            <input type="text" id="newUserAddress" />
+          </div>
+        </div>
+        <div class="ticket-form-row">
+          <div class="field">
+            <label data-i18n="depot.postalCodeLabel">Postleitzahl</label>
+            <input type="text" id="newUserPostalCode" style="min-width:120px;" />
+          </div>
+          <div class="field">
+            <label data-i18n="depot.cityLabel">Ort</label>
+            <input type="text" id="newUserCity" />
+          </div>
+        </div>
+        <div class="ticket-form-row">
+          <label style="display:flex; align-items:center; gap:0.5rem; font-weight:500; font-size:0.9rem;">
+            <input type="checkbox" id="newUserIsAdmin" style="width:auto;" />
+            <span data-i18n="admin.isAdminLabel">Admin-Rechte geben</span>
+          </label>
+        </div>
+        <p class="warning" id="newUserWarning" hidden></p>
+        <div class="actions" style="justify-content:flex-start; margin-top:0.8rem;">
+          <button class="btn btn-primary" id="createUserBtn" type="button" data-i18n="admin.createUserButton">Nutzer anlegen</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 id="drawFormTitle" data-i18n="admin.addDrawTitle">Neue Ziehung erfassen</h2>
+        <p class="hint" id="editingDrawNote" data-i18n="admin.editingDrawNote" hidden></p>
+        <p class="hint" data-i18n="tickets.chooseGameLabel">Lotterie</p>
+        <div class="game-switch" id="drawGameSwitch"></div>
+
+        <div class="group-label">
+          <span data-i18n="mainNumbersLabel">Zahlen</span>
+          <span class="count" id="drawMainCount">0 / 5</span>
+        </div>
+        <div class="grid" id="drawMainGrid"></div>
+
+        <div class="bonus-section">
+          <div class="group-label">
+            <span id="drawBonusLabel">Sterne</span>
+            <span class="count" id="drawBonusCount">0 / 2</span>
+          </div>
+          <div class="grid grid-bonus" id="drawBonusGrid"></div>
+        </div>
+
+        <div class="ticket-form-row" style="margin-top:1.2rem;">
+          <div class="field">
+            <label data-i18n="admin.drawDateLabel">Ziehungsdatum</label>
+            <input type="date" id="drawDateInput" />
+          </div>
+        </div>
+
+        <p class="warning" id="drawWarning" hidden></p>
+
+        <div class="actions" style="margin-top:1.2rem;">
+          <button class="btn btn-primary" id="addDrawBtn" type="button" data-i18n="admin.addDrawButton">Ziehung speichern</button>
+          <button class="btn btn-secondary" id="cancelEditDrawBtn" type="button" data-i18n="admin.cancelEditLabel" hidden>Abbrechen</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 data-i18n="admin.drawsTitle">Ziehungsergebnisse</h2>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th data-i18n="admin.colGame">Lotterie</th>
+                <th data-i18n="admin.colNumbers">Zahlen</th>
+                <th data-i18n="admin.drawDateLabel">Ziehungsdatum</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="drawsTableBody"></tbody>
+          </table>
+        </div>
+        <p class="empty-state" id="drawsEmpty" data-i18n="admin.noDrawsMessage" hidden></p>
+      </section>
+
+      <section class="panel">
+        <h2 data-i18n="admin.ticketsTitle">Alle Tickets</h2>
+        <p class="hint" data-i18n="admin.statusNote">Status basiert auf der zuletzt erfassten Ziehung.</p>
+        <div class="table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th data-i18n="admin.colUser">Nutzer</th>
+                <th data-i18n="admin.colGame">Lotterie</th>
+                <th data-i18n="admin.colNumbers">Zahlen</th>
+                <th data-i18n="admin.colPlayed">Gespielt am</th>
+                <th data-i18n="admin.colPrice">Spielpreis</th>
+                <th data-i18n="admin.colWonAmount">Gewinnbetrag</th>
+                <th data-i18n="admin.colStatus">Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="ticketsTableBody"></tbody>
+          </table>
+        </div>
+        <p class="empty-state" id="ticketsEmpty" data-i18n="admin.noTicketsMessage" hidden></p>
+      </section>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-col">
+        <h4 data-i18n="brand">Lotto Checker</h4>
+        <p data-i18n="footerDisclaimer"></p>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footerNavTitle">Navigation</h4>
+        <ul class="footer-links">
+          <li><a href="index.html" data-i18n="nav.home">Startseite</a></li>
+          <li><a href="checker.html" data-i18n="nav.checker">Zahlen-Checker</a></li>
+          <li><a href="tickets.html" data-i18n="nav.tickets">Meine Tickets</a></li>
+          <li><a href="depot.html" data-i18n="nav.depot">Mein Depot</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 data-i18n="footerGamesTitle">Lotterien</h4>
+        <ul class="footer-links" id="footerGamesList"></ul>
+      </div>
+      <div class="footer-col">
+        <h4>Rechtliches</h4>
+        <ul class="footer-links">
+          <li><a href="impressum.html">Impressum</a></li>
+          <li><a href="datenschutz.html">Datenschutz</a></li>
+          <li><a href="agb.html">AGB</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom" id="footerYear"></div>
+  </footer>
+
+  <script src="assets/games.js"></script>
+  <script src="assets/i18n.js"></script>
+  <script src="assets/admin.js"></script>
+</body>
+</html>

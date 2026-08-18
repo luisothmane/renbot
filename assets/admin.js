@@ -369,6 +369,106 @@ async function setTicketStatus(id, status) {
   await loadTickets();
 }
 
+function toDateInputValue(value) {
+  const match = /^(\d{4}-\d{2}-\d{2})/.exec(value || "");
+  return match ? match[1] : "";
+}
+
+async function saveTicketEdit(ticket, main, bonus, dateVal, warnEl) {
+  const T = t();
+  const spec = GAME_SPECS[ticket.gameId];
+  if (main.size !== spec.mainCount || bonus.size !== spec.bonusCount || !dateVal) {
+    warnEl.textContent = T.tickets.ticketIncompleteWarning;
+    warnEl.hidden = false;
+    return;
+  }
+  warnEl.hidden = true;
+  await api(`api/admin/tickets.php?id=${encodeURIComponent(ticket.id)}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      main: [...main].sort((a, b) => a - b),
+      bonus: [...bonus].sort((a, b) => a - b),
+      playedDate: dateVal
+    })
+  });
+  await loadTickets();
+}
+
+function buildTicketEditRow(ticket, spec, T) {
+  const tr = document.createElement("tr");
+  tr.hidden = true;
+  const td = document.createElement("td");
+  td.colSpan = 6;
+
+  const note = document.createElement("p");
+  note.className = "hint";
+  note.textContent = T.admin.editingTicketNote;
+  td.appendChild(note);
+
+  const editMain = new Set(ticket.main);
+  const editBonus = new Set(ticket.bonus);
+
+  const mainLabel = document.createElement("div");
+  mainLabel.className = "group-label";
+  mainLabel.innerHTML = `<span>${T.mainNumbersLabel}</span><span class="count">${T.countLabel(editMain.size, spec.mainCount)}</span>`;
+  td.appendChild(mainLabel);
+
+  const mainGrid = document.createElement("div");
+  mainGrid.className = "grid";
+  td.appendChild(mainGrid);
+  buildBallGrid(mainGrid, spec.mainMin, spec.mainMax, spec.mainCount, editMain, () => {
+    mainLabel.querySelector(".count").textContent = T.countLabel(editMain.size, spec.mainCount);
+  });
+
+  if (spec.bonusCount > 0) {
+    const bonusLabel = document.createElement("div");
+    bonusLabel.className = "group-label";
+    bonusLabel.innerHTML = `<span>${T.games[ticket.gameId].bonusLabel}</span><span class="count">${T.countLabel(editBonus.size, spec.bonusCount)}</span>`;
+    td.appendChild(bonusLabel);
+    const bonusGrid = document.createElement("div");
+    bonusGrid.className = "grid grid-bonus";
+    td.appendChild(bonusGrid);
+    buildBallGrid(bonusGrid, spec.bonusMin, spec.bonusMax, spec.bonusCount, editBonus, () => {
+      bonusLabel.querySelector(".count").textContent = T.countLabel(editBonus.size, spec.bonusCount);
+    });
+  }
+
+  const dateRow = document.createElement("div");
+  dateRow.className = "ticket-form-row";
+  dateRow.style.marginTop = "1rem";
+  const dateField = document.createElement("div");
+  dateField.className = "field";
+  const dateLabel = document.createElement("label");
+  dateLabel.textContent = T.admin.playedDateLabel;
+  const dateInput = document.createElement("input");
+  dateInput.type = "date";
+  dateInput.value = toDateInputValue(ticket.createdAt);
+  dateField.appendChild(dateLabel);
+  dateField.appendChild(dateInput);
+  dateRow.appendChild(dateField);
+  td.appendChild(dateRow);
+
+  const warn = document.createElement("p");
+  warn.className = "warning";
+  warn.hidden = true;
+  td.appendChild(warn);
+
+  const actions = document.createElement("div");
+  actions.className = "actions";
+  actions.style.justifyContent = "flex-start";
+  actions.style.marginTop = "1rem";
+  const saveBtn = document.createElement("button");
+  saveBtn.className = "btn btn-primary";
+  saveBtn.type = "button";
+  saveBtn.textContent = T.admin.updateTicketButton;
+  saveBtn.addEventListener("click", () => saveTicketEdit(ticket, editMain, editBonus, dateInput.value, warn));
+  actions.appendChild(saveBtn);
+  td.appendChild(actions);
+
+  tr.appendChild(td);
+  return tr;
+}
+
 function renderTickets() {
   const T = t();
   const body = document.getElementById("ticketsTableBody");
@@ -419,6 +519,17 @@ function renderTickets() {
       <td></td>
     `;
 
+    const editRow = buildTicketEditRow(ticket, spec, T);
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "btn-sm";
+    editBtn.type = "button";
+    editBtn.textContent = T.admin.editTicketLabel;
+    editBtn.style.marginRight = "0.4rem";
+    editBtn.addEventListener("click", () => {
+      editRow.hidden = !editRow.hidden;
+    });
+
     const winBtn = document.createElement("button");
     winBtn.className = "btn-sm";
     winBtn.type = "button";
@@ -433,6 +544,7 @@ function renderTickets() {
     lossBtn.addEventListener("click", () => setTicketStatus(ticket.id, "loss"));
 
     const actionsCell = tr.lastElementChild;
+    actionsCell.appendChild(editBtn);
     actionsCell.appendChild(winBtn);
     actionsCell.appendChild(lossBtn);
 
@@ -446,6 +558,7 @@ function renderTickets() {
     }
 
     body.appendChild(tr);
+    body.appendChild(editRow);
   });
 }
 

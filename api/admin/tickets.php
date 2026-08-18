@@ -54,5 +54,25 @@ if ($method === 'PATCH') {
     exit;
 }
 
+if ($method === 'PUT') {
+    $id = (int) ($_GET['id'] ?? 0);
+    $input = json_body();
+    $main = is_array($input['main'] ?? null) ? array_map('intval', array_values($input['main'])) : [];
+    $bonus = is_array($input['bonus'] ?? null) ? array_map('intval', array_values($input['bonus'])) : [];
+    $playedDate = (string) ($input['playedDate'] ?? '');
+
+    if ($id <= 0 || empty($main) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $playedDate)) {
+        http_response_code(422);
+        echo json_encode(['error' => 'invalid_ticket']);
+        exit;
+    }
+
+    $stmt = $pdo->prepare('UPDATE tickets SET main_numbers = ?, bonus_numbers = ?, created_at = ? WHERE id = ?');
+    $stmt->execute([json_encode($main), json_encode($bonus), $playedDate . ' 00:00:00', $id]);
+
+    echo json_encode(['ok' => true]);
+    exit;
+}
+
 http_response_code(405);
 echo json_encode(['error' => 'method_not_allowed']);

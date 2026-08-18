@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EuroMillions Zahlen-Checker</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header>
+    <div class="lang-switch">
+      <button class="lang-btn" data-lang="de" type="button">🇩🇪 Deutsch</button>
+      <button class="lang-btn" data-lang="fr" type="button">🇫🇷 Français</button>
+      <button class="lang-btn" data-lang="nl" type="button">🇳🇱 Nederlands</button>
+      <button class="lang-btn" data-lang="be" type="button">🇧🇪 Belgique/België</button>
+    </div>
+    <h1 data-i18n="headerTitle">EuroMillions Zahlen-Checker</h1>
+    <p data-i18n="headerSubtitle">Gib deine Tipp-Zahlen und die Ziehungszahlen ein.</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2 data-i18n="yourNumbersTitle">1. Deine getippten Zahlen</h2>
+      <p class="hint" data-i18n="yourNumbersHint">Wähle 5 Zahlen und 2 Sterne.</p>
+
+      <div class="group-label">
+        <span data-i18n="mainNumbersLabel">Zahlen</span>
+        <span class="count" id="yourMainCount">0 / 5</span>
+      </div>
+      <div class="grid" id="yourMainGrid" data-count="main"></div>
+
+      <div class="group-label">
+        <span data-i18n="starsLabel">Sterne</span>
+        <span class="count" id="yourStarsCount">0 / 2</span>
+      </div>
+      <div class="grid" id="yourStarsGrid" data-count="stars"></div>
+    </section>
+
+    <section class="panel">
+      <h2 data-i18n="winningNumbersTitle">2. Ziehungszahlen</h2>
+      <p class="hint" data-i18n="winningNumbersHint">Trage die offiziellen Gewinnzahlen ein.</p>
+
+      <div class="group-label">
+        <span data-i18n="mainNumbersLabel">Zahlen</span>
+        <span class="count" id="winMainCount">0 / 5</span>
+      </div>
+      <div class="grid" id="winMainGrid" data-count="main"></div>
+
+      <div class="group-label">
+        <span data-i18n="starsLabel">Sterne</span>
+        <span class="count" id="winStarsCount">0 / 2</span>
+      </div>
+      <div class="grid" id="winStarsGrid" data-count="stars"></div>
+
+      <div class="example-row">
+        <label for="exampleSelect" data-i18n="exampleDrawsLabel">Beispiel-Ziehung laden:</label>
+        <select id="exampleSelect"></select>
+      </div>
+    </section>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="checkBtn" data-i18n="checkButton" type="button">Zahlen prüfen</button>
+      <button class="btn btn-secondary" id="resetBtn" data-i18n="resetButton" type="button">Zurücksetzen</button>
+    </div>
+
+    <p class="warning" id="incompleteWarning" hidden></p>
+
+    <section class="panel result-panel" id="resultPanel" hidden>
+      <h2 data-i18n="resultTitle">Ergebnis</h2>
+      <p id="resultSummary"></p>
+      <p id="resultTier" hidden></p>
+      <p id="resultMessage"></p>
+    </section>
+  </main>
+
+  <footer>
+    <p data-i18n="footerDisclaimer"></p>
+    <p data-i18n="footerNote"></p>
+  </footer>
+
+  <script src="assets/i18n.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

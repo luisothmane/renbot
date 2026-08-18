@@ -890,7 +890,11 @@ select {
   color: var(--text-dim);
 }
 
-.field input[type="text"] {
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"],
+.field input[type="date"],
+.field input[type="number"] {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   padding: 0.6rem 0.8rem;
@@ -1108,7 +1112,7 @@ select {
   margin: 0 auto;
   padding: 3rem 1.5rem 2rem;
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
   gap: 2.5rem;
 }
 

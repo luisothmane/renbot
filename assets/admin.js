@@ -39,6 +39,11 @@ function numbersToText(main, bonus) {
   return text;
 }
 
+function formatMoney(amount) {
+  const locales = { de: "de-DE", fr: "fr-FR", nl: "nl-NL", be: "nl-BE" };
+  return new Intl.NumberFormat(locales[lang] || "de-DE", { style: "currency", currency: "EUR" }).format(amount);
+}
+
 /* ---------- Access gate ---------- */
 
 async function checkAccess() {
@@ -374,10 +379,11 @@ function toDateInputValue(value) {
   return match ? match[1] : "";
 }
 
-async function saveTicketEdit(ticket, main, bonus, dateVal, warnEl) {
+async function saveTicketEdit(ticket, main, bonus, dateVal, priceVal, wonAmountVal, warnEl) {
   const T = t();
   const spec = GAME_SPECS[ticket.gameId];
-  if (main.size !== spec.mainCount || bonus.size !== spec.bonusCount || !dateVal) {
+  const priceNum = Number(priceVal);
+  if (main.size !== spec.mainCount || bonus.size !== spec.bonusCount || !dateVal || !priceVal || Number.isNaN(priceNum) || priceNum < 0) {
     warnEl.textContent = T.tickets.ticketIncompleteWarning;
     warnEl.hidden = false;
     return;
@@ -388,7 +394,9 @@ async function saveTicketEdit(ticket, main, bonus, dateVal, warnEl) {
     body: JSON.stringify({
       main: [...main].sort((a, b) => a - b),
       bonus: [...bonus].sort((a, b) => a - b),
-      playedDate: dateVal
+      playedDate: dateVal,
+      price: priceNum,
+      wonAmount: wonAmountVal === "" ? null : Number(wonAmountVal)
     })
   });
   await loadTickets();
@@ -398,7 +406,7 @@ function buildTicketEditRow(ticket, spec, T) {
   const tr = document.createElement("tr");
   tr.hidden = true;
   const td = document.createElement("td");
-  td.colSpan = 6;
+  td.colSpan = 8;
 
   const note = document.createElement("p");
   note.className = "hint";
@@ -446,6 +454,33 @@ function buildTicketEditRow(ticket, spec, T) {
   dateField.appendChild(dateLabel);
   dateField.appendChild(dateInput);
   dateRow.appendChild(dateField);
+
+  const priceField = document.createElement("div");
+  priceField.className = "field";
+  const priceLabel = document.createElement("label");
+  priceLabel.textContent = T.admin.priceLabel;
+  const priceInput = document.createElement("input");
+  priceInput.type = "number";
+  priceInput.min = "0";
+  priceInput.step = "0.01";
+  priceInput.value = ticket.price;
+  priceField.appendChild(priceLabel);
+  priceField.appendChild(priceInput);
+  dateRow.appendChild(priceField);
+
+  const wonField = document.createElement("div");
+  wonField.className = "field";
+  const wonLabel = document.createElement("label");
+  wonLabel.textContent = T.admin.wonAmountLabel;
+  const wonInput = document.createElement("input");
+  wonInput.type = "number";
+  wonInput.min = "0";
+  wonInput.step = "0.01";
+  wonInput.value = ticket.wonAmount === null || ticket.wonAmount === undefined ? "" : ticket.wonAmount;
+  wonField.appendChild(wonLabel);
+  wonField.appendChild(wonInput);
+  dateRow.appendChild(wonField);
+
   td.appendChild(dateRow);
 
   const warn = document.createElement("p");
@@ -461,7 +496,7 @@ function buildTicketEditRow(ticket, spec, T) {
   saveBtn.className = "btn btn-primary";
   saveBtn.type = "button";
   saveBtn.textContent = T.admin.updateTicketButton;
-  saveBtn.addEventListener("click", () => saveTicketEdit(ticket, editMain, editBonus, dateInput.value, warn));
+  saveBtn.addEventListener("click", () => saveTicketEdit(ticket, editMain, editBonus, dateInput.value, priceInput.value, wonInput.value, warn));
   actions.appendChild(saveBtn);
   td.appendChild(actions);
 
@@ -515,6 +550,8 @@ function renderTickets() {
       <td>${info ? info.name : ticket.gameId}</td>
       <td>${numbersToText(ticket.main, ticket.bonus)}</td>
       <td>${formatDate(ticket.createdAt)}</td>
+      <td>${formatMoney(ticket.price)}</td>
+      <td>${ticket.wonAmount === null ? "—" : formatMoney(ticket.wonAmount)}</td>
       <td>${statusHtml}</td>
       <td></td>
     `;

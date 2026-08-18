@@ -5,6 +5,8 @@
 -- of these you're missing instead of the whole file:
 --   ALTER TABLE users ADD COLUMN is_admin TINYINT(1) NOT NULL DEFAULT 0;
 --   ALTER TABLE tickets ADD COLUMN status_override VARCHAR(10) DEFAULT NULL;
+--   ALTER TABLE tickets ADD COLUMN price DECIMAL(10,2) NOT NULL DEFAULT 96.00;
+--   ALTER TABLE tickets ADD COLUMN won_amount DECIMAL(10,2) DEFAULT NULL;
 --   -- then the CREATE TABLE draws statement below (if you don't have it yet).
 
 CREATE TABLE IF NOT EXISTS users (
@@ -30,6 +32,8 @@ CREATE TABLE IF NOT EXISTS tickets (
   -- Set by an admin to override the auto-computed win/loss status
   -- ('win', 'loss', or NULL to fall back to matching against draws).
   status_override VARCHAR(10) DEFAULT NULL,
+  price DECIMAL(10,2) NOT NULL DEFAULT 96.00,
+  won_amount DECIMAL(10,2) DEFAULT NULL,
   CONSTRAINT fk_tickets_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

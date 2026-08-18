@@ -8,6 +8,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 if ($method === 'GET') {
     $stmt = $pdo->query(
         'SELECT t.id, t.game_id, t.main_numbers, t.bonus_numbers, t.created_at, t.status_override,
+                t.price, t.won_amount,
                 u.id AS user_id, u.email, u.first_name, u.last_name
          FROM tickets t
          JOIN users u ON u.id = t.user_id
@@ -23,6 +24,8 @@ if ($method === 'GET') {
             'bonus' => json_decode($row['bonus_numbers'], true) ?: [],
             'createdAt' => $row['created_at'],
             'statusOverride' => $row['status_override'],
+            'price' => (float) $row['price'],
+            'wonAmount' => $row['won_amount'] !== null ? (float) $row['won_amount'] : null,
             'user' => [
                 'id' => (int) $row['user_id'],
                 'email' => $row['email'],
@@ -60,15 +63,18 @@ if ($method === 'PUT') {
     $main = is_array($input['main'] ?? null) ? array_map('intval', array_values($input['main'])) : [];
     $bonus = is_array($input['bonus'] ?? null) ? array_map('intval', array_values($input['bonus'])) : [];
     $playedDate = (string) ($input['playedDate'] ?? '');
+    $price = is_numeric($input['price'] ?? null) ? round((float) $input['price'], 2) : null;
+    $wonAmountRaw = $input['wonAmount'] ?? null;
+    $wonAmount = ($wonAmountRaw === null || $wonAmountRaw === '') ? null : round((float) $wonAmountRaw, 2);
 
-    if ($id <= 0 || empty($main) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $playedDate)) {
+    if ($id <= 0 || empty($main) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $playedDate) || $price === null || $price < 0) {
         http_response_code(422);
         echo json_encode(['error' => 'invalid_ticket']);
         exit;
     }
 
-    $stmt = $pdo->prepare('UPDATE tickets SET main_numbers = ?, bonus_numbers = ?, created_at = ? WHERE id = ?');
-    $stmt->execute([json_encode($main), json_encode($bonus), $playedDate . ' 00:00:00', $id]);
+    $stmt = $pdo->prepare('UPDATE tickets SET main_numbers = ?, bonus_numbers = ?, created_at = ?, price = ?, won_amount = ? WHERE id = ?');
+    $stmt->execute([json_encode($main), json_encode($bonus), $playedDate . ' 00:00:00', $price, $wonAmount, $id]);
 
     echo json_encode(['ok' => true]);
     exit;

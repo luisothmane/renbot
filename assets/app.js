@@ -198,9 +198,11 @@ function renderGameTabs() {
     const info = T.games[id];
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "game-btn" + (id === STATE.gameId ? " active" : "");
+    btn.className = "game-card" + (id === STATE.gameId ? " active" : "");
     btn.dataset.game = id;
-    btn.innerHTML = `<span class="game-icon">${spec.icon}</span><span>${info.name}</span>`;
+    btn.style.setProperty("--game-from", spec.colorFrom);
+    btn.style.setProperty("--game-to", spec.colorTo);
+    btn.innerHTML = `<span class="game-badge">${spec.mono}</span><span class="game-name">${info.name}</span>`;
     btn.addEventListener("click", () => setGame(id));
     container.appendChild(btn);
   });

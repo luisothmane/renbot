@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Europa Lotto Zahlen-Checker</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23ffd23f'/%3E%3Ctext x='50' y='66' font-size='54' text-anchor='middle' font-family='sans-serif'%3E%F0%9F%8D%80%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='35%25' cy='30%25' r='75%25'%3E%3Cstop offset='0%25' stop-color='%23ffe08a'/%3E%3Cstop offset='100%25' stop-color='%23c9781a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='46' fill='url(%23g)'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -15,15 +15,21 @@
     <div class="topbar-inner">
       <div class="brand" data-i18n="brand">Lotto Checker</div>
       <div class="lang-switch">
-        <button class="lang-btn" data-lang="de" type="button">🇩🇪 Deutsch</button>
-        <button class="lang-btn" data-lang="fr" type="button">🇫🇷 Français</button>
-        <button class="lang-btn" data-lang="nl" type="button">🇳🇱 Nederlands</button>
-        <button class="lang-btn" data-lang="be" type="button">🇧🇪 Belgique/België</button>
+        <button class="lang-btn" data-lang="de" type="button" title="Deutsch"><span class="flag">🇩🇪</span>DE</button>
+        <button class="lang-btn" data-lang="fr" type="button" title="Français"><span class="flag">🇫🇷</span>FR</button>
+        <button class="lang-btn" data-lang="nl" type="button" title="Nederlands"><span class="flag">🇳🇱</span>NL</button>
+        <button class="lang-btn" data-lang="be" type="button" title="Belgique/België"><span class="flag">🇧🇪</span>BE</button>
       </div>
     </div>
   </div>
 
   <header>
+    <div class="header-orbs" aria-hidden="true">
+      <span class="orb orb-1"></span>
+      <span class="orb orb-2"></span>
+      <span class="orb orb-3"></span>
+      <span class="orb orb-4"></span>
+    </div>
     <h1 data-i18n="headerTitle">Europa Lotto Zahlen-Checker</h1>
     <p data-i18n="headerSubtitle">Wähle eine Lotterie und prüfe deine Zahlen.</p>
   </header>

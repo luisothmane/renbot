@@ -6,7 +6,8 @@ const GAME_ORDER = ["euromillions", "eurojackpot", "lotto49", "loto", "lotto645"
 
 const GAME_SPECS = {
   euromillions: {
-    icon: "🌟",
+    mono: "EM",
+    colorFrom: "#a78bfa", colorTo: "#6d28d9",
     mainCount: 5, mainMin: 1, mainMax: 50,
     bonusCount: 2, bonusMin: 1, bonusMax: 12,
     tiers: [[5, 2], [5, 1], [5, 0], [4, 2], [4, 1], [3, 2], [4, 0], [2, 2], [3, 1], [3, 0], [1, 2], [2, 1], [2, 0]],
@@ -16,7 +17,8 @@ const GAME_SPECS = {
     ]
   },
   eurojackpot: {
-    icon: "🚀",
+    mono: "EJ",
+    colorFrom: "#2dd4bf", colorTo: "#0f766e",
     mainCount: 5, mainMin: 1, mainMax: 50,
     bonusCount: 2, bonusMin: 1, bonusMax: 12,
     tiers: [[5, 2], [5, 1], [5, 0], [4, 2], [4, 1], [3, 2], [4, 0], [2, 2], [3, 1], [3, 0], [1, 2], [2, 1]],
@@ -26,7 +28,8 @@ const GAME_SPECS = {
     ]
   },
   lotto49: {
-    icon: "🇩🇪",
+    mono: "49",
+    colorFrom: "#fb7185", colorTo: "#9f1239",
     mainCount: 6, mainMin: 1, mainMax: 49,
     bonusCount: 1, bonusMin: 0, bonusMax: 9,
     tiers: [[6, 1], [6, 0], [5, 1], [5, 0], [4, 1], [4, 0], [3, 1], [3, 0], [2, 1]],
@@ -36,7 +39,8 @@ const GAME_SPECS = {
     ]
   },
   loto: {
-    icon: "🇫🇷",
+    mono: "FR",
+    colorFrom: "#60a5fa", colorTo: "#1e40af",
     mainCount: 5, mainMin: 1, mainMax: 49,
     bonusCount: 1, bonusMin: 1, bonusMax: 10,
     tiers: [[5, 1], [5, 0], [4, 1], [4, 0], [3, 1], [3, 0], [2, 1], [1, 1], [0, 1]],
@@ -46,7 +50,8 @@ const GAME_SPECS = {
     ]
   },
   lotto645: {
-    icon: "🇳🇱",
+    mono: "NL",
+    colorFrom: "#fbbf24", colorTo: "#b45309",
     mainCount: 6, mainMin: 1, mainMax: 45,
     bonusCount: 0, bonusMin: 0, bonusMax: 0,
     tiers: [[6, 0], [5, 0], [4, 0], [3, 0]],

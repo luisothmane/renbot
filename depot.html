@@ -40,7 +40,7 @@
     </div>
 
     <section class="panel" id="authSection">
-      <div class="actions" style="justify-content:flex-start; gap:0.5rem; margin-bottom:1.3rem;">
+      <div class="actions">
         <button class="btn-sm" id="tabLogin" type="button" data-i18n="depot.loginTab">Anmelden</button>
         <button class="btn-sm" id="tabRegister" type="button" data-i18n="depot.registerTab">Konto erstellen</button>
       </div>
@@ -49,15 +49,21 @@
         <div class="ticket-form-row">
           <div class="field">
             <label data-i18n="depot.emailLabel">E-Mail</label>
-            <input type="email" id="loginEmail" required />
+            <div class="input-icon">
+              <span class="icon-glyph" aria-hidden="true">✉️</span>
+              <input type="email" id="loginEmail" required />
+            </div>
           </div>
           <div class="field">
             <label data-i18n="depot.passwordLabel">Passwort</label>
-            <input type="password" id="loginPassword" required minlength="8" />
+            <div class="input-icon">
+              <span class="icon-glyph" aria-hidden="true">🔒</span>
+              <input type="password" id="loginPassword" required minlength="8" />
+            </div>
           </div>
         </div>
         <p class="warning" id="loginError" hidden></p>
-        <div class="actions" style="justify-content:flex-start;">
+        <div class="actions">
           <button class="btn btn-primary" type="submit" data-i18n="depot.loginButton">Anmelden</button>
         </div>
       </form>
@@ -92,16 +98,22 @@
         <div class="ticket-form-row">
           <div class="field">
             <label data-i18n="depot.emailLabel">E-Mail</label>
-            <input type="email" id="regEmail" required />
+            <div class="input-icon">
+              <span class="icon-glyph" aria-hidden="true">✉️</span>
+              <input type="email" id="regEmail" required />
+            </div>
           </div>
           <div class="field">
             <label data-i18n="depot.passwordLabel">Passwort</label>
-            <input type="password" id="regPassword" required minlength="8" />
+            <div class="input-icon">
+              <span class="icon-glyph" aria-hidden="true">🔒</span>
+              <input type="password" id="regPassword" required minlength="8" />
+            </div>
             <span class="ticket-meta" data-i18n="depot.passwordHint">Mindestens 8 Zeichen.</span>
           </div>
         </div>
         <p class="warning" id="registerError" hidden></p>
-        <div class="actions" style="justify-content:flex-start;">
+        <div class="actions">
           <button class="btn btn-primary" type="submit" data-i18n="depot.registerButton">Konto erstellen</button>
         </div>
       </form>

@@ -903,6 +903,84 @@ select {
   min-width: 220px;
 }
 
+/* ================= Auth (Depot login/register) ================= */
+#authSection {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 2.4rem 2.1rem;
+}
+
+#authSection > .actions {
+  background: var(--surface-tint);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.3rem;
+  gap: 0.3rem;
+  margin-bottom: 1.6rem !important;
+}
+
+#authSection > .actions .btn-sm {
+  flex: 1;
+  border: none;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+}
+
+#authSection .ticket-form-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.1rem;
+}
+
+#authSection .field {
+  width: 100%;
+}
+
+#authSection .field label {
+  font-size: 0.85rem;
+}
+
+#authSection .input-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#authSection .input-icon .icon-glyph {
+  position: absolute;
+  left: 0.95rem;
+  font-size: 1rem;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+#authSection .input-icon input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.85rem 1rem 0.85rem 2.7rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--border-strong);
+  font-size: 0.96rem;
+  background: var(--surface-tint);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+#authSection .input-icon input:focus {
+  outline: none;
+  border-color: var(--gold-2);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px rgba(244, 168, 37, 0.16);
+}
+
+#authSection form > .actions {
+  justify-content: stretch;
+}
+
+#authSection form > .actions .btn-primary {
+  width: 100%;
+  justify-content: center;
+}
+
 .ticket-list {
   display: flex;
   flex-direction: column;
